@@ -1,0 +1,144 @@
+- generic [ref=e1]:
+  - link "Skip to main content" [ref=e2] [cursor=pointer]:
+    - /url: "#main-content"
+    - generic [ref=e4]: Skip to main content
+  - generic [ref=e6]:
+    - generic:
+      - generic [ref=e7]:
+        - generic: Submit to r/recruitinghell
+      - banner [ref=e10]:
+        - navigation [ref=e11]:
+          - link "Home" [ref=e15] [cursor=pointer]:
+            - /url: https://www.reddit.com/
+            - img [ref=e17]
+          - search [ref=e33]:
+            - generic [ref=e35]:
+              - img [ref=e38]
+              - generic "Remove r/recruitinghell filter and expand search to all of Reddit" [ref=e41] [cursor=pointer]:
+                - button [pressed] [ref=e42]
+              - textbox "Remove r/recruitinghell filter and expand search to all of Reddit" [ref=e52]:
+                - /placeholder: Search in ⁨r/recruitinghell⁩
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - link "Advertise on Reddit" [ref=e60] [cursor=pointer]:
+                - /url: https://ads.reddit.com/register?utm_source=web3x_consumer&utm_name=nav_cta
+                - img [ref=e63]
+                - generic [ref=e65]
+              - button "Open chat" [ref=e71] [cursor=pointer]:
+                - img [ref=e74]
+                - generic [ref=e76]
+              - link "Create post" [ref=e81] [cursor=pointer]:
+                - /url: /r/recruitinghell/submit/
+                - generic [ref=e82]
+                - generic [ref=e87]
+              - generic [ref=e89]:
+                - link "Open inbox" [ref=e92] [cursor=pointer]:
+                  - /url: /notifications
+                - generic
+            - button "User is online Expand user menu" [ref=e102] [cursor=pointer]:
+              - generic [ref=e109]:
+                - img [ref=e112]
+                - generic "User is online" [ref=e114]
+              - generic [ref=e115]:
+                - generic: Expand user menu
+      - generic [ref=e116]:
+        - generic [ref=e117]:
+          - generic [ref=e118]:
+            - generic:
+              - generic:
+                - link "Skip to Navigation" [ref=e119] [cursor=pointer]:
+                  - /url: "#left-sidebar-container"
+                - link "Skip to Right Sidebar" [ref=e120] [cursor=pointer]:
+                  - /url: "#right-sidebar-container"
+          - generic [ref=e121]:
+            - main [ref=e122]:
+              - generic "Submit to r/recruitinghell"
+              - generic [ref=e123]:
+                - heading "Create post" [level=1] [ref=e124]
+                - button "Drafts" [ref=e127] [cursor=pointer]
+              - generic [ref=e130]:
+                - generic
+            - generic [ref=e341]:
+              - generic [ref=e343]:
+                - heading "r/recruitinghell Rules" [level=2] [ref=e345]
+                - generic [ref=e347]
+              - generic [ref=e493]:
+                - heading "Set user flair" [level=2] [ref=e495]
+                - button "Gullible-Agency8312" [ref=e498]
+            - list [ref=e512]:
+              - listitem [ref=e513]:
+                - link "Reddit Rules" [ref=e515] [cursor=pointer]:
+                  - /url: https://www.redditinc.com/policies/content-policy
+              - listitem [ref=e516]:
+                - link "Privacy Policy" [ref=e518] [cursor=pointer]:
+                  - /url: https://www.reddit.com/policies/privacy-policy
+              - listitem [ref=e519]:
+                - link "User Agreement" [ref=e521] [cursor=pointer]:
+                  - /url: https://www.redditinc.com/policies/user-agreement
+              - listitem [ref=e522]:
+                - link "Accessibility" [ref=e524] [cursor=pointer]:
+                  - /url: https://support.reddithelp.com/hc/sections/38303584022676-Accessibility
+                - generic [ref=e525]: •
+              - listitem [ref=e526]:
+                - link "Reddit, Inc. © 2026. All rights reserved." [ref=e527] [cursor=pointer]:
+                  - /url: https://redditinc.com
+        - generic [ref=e529]:
+          - button "Collapse Navigation" [ref=e532] [cursor=pointer]:
+            - img [ref=e535]
+            - generic [ref=e537]:
+              - generic: Collapse Navigation
+          - navigation "Primary" [ref=e542]:
+            - generic [ref=e544]:
+              - link "Home" [ref=e546] [cursor=pointer]:
+                - /url: https://www.reddit.com/?feed=home
+                - generic [ref=e547]
+              - link "Popular" [ref=e554] [cursor=pointer]:
+                - /url: https://www.reddit.com/r/popular/
+                - generic [ref=e555]
+              - link "News" [ref=e561] [cursor=pointer]:
+                - /url: https://www.reddit.com/news/
+                - generic [ref=e562]
+              - link "Explore" [ref=e570] [cursor=pointer]:
+                - /url: https://www.reddit.com/explore/
+                - generic [ref=e571]
+              - button "Start a community" [ref=e577] [cursor=pointer]:
+                - generic [ref=e578]
+            - separator [ref=e584]
+            - group [ref=e588]:
+              - generic "GAMES ON REDDIT" [ref=e589] [cursor=pointer]:
+                - generic [ref=e590]
+            - separator [ref=e600]
+            - group [ref=e974]:
+              - generic "CUSTOM FEEDS" [ref=e975] [cursor=pointer]:
+                - generic [ref=e977]
+              - button "Create Custom Feed" [ref=e989] [cursor=pointer]:
+                - generic [ref=e990]
+            - separator [ref=e996]
+            - group [ref=e603]:
+              - generic "RECENT" [ref=e604] [cursor=pointer]:
+                - generic [ref=e605]
+              - generic [ref=e614]:
+                - link "r/sideprojects" [ref=e615] [cursor=pointer]:
+                  - /url: /r/sideprojects/
+                - link "r/indiehackers" [ref=e625] [cursor=pointer]:
+                  - /url: /r/indiehackers/
+                - link "r/recruitinghell" [ref=e635] [cursor=pointer]:
+                  - /url: /r/recruitinghell/
+                - link "r/cscareerquestions" [ref=e645] [cursor=pointer]:
+                  - /url: /r/cscareerquestions/
+                - link "r/Breadit" [ref=e655] [cursor=pointer]:
+                  - /url: /r/Breadit/
+            - group [ref=e666]:
+              - generic "COMMUNITIES" [ref=e667] [cursor=pointer]:
+                - generic [ref=e669]
+              - generic [ref=e678]:
+                - link "Manage Communities" [ref=e679] [cursor=pointer]:
+                  - /url: /user/Gullible-Agency8312/communities
+                - generic [ref=e687]
+            - separator [ref=e832]
+            - navigation "Reddit resources" [ref=e833]:
+              - group [ref=e835]:
+                - generic "RESOURCES" [ref=e836] [cursor=pointer]
+                - generic [ref=e847]
+            - link "Reddit, Inc. © 2026. All rights reserved." [ref=e972] [cursor=pointer]:
+              - /url: https://redditinc.com

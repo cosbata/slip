@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RejectionBoard — 3-column Variants</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0D0D0D; color: #D7DADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+.sw {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: #050505; border-bottom: 1px solid #1e1f20;
+  display: flex; align-items: center; padding: 0 20px; height: 38px;
+}
+.sw-label { font-size: 11px; color: #444; margin-right: 12px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sw-btn {
+  padding: 0 16px; height: 38px; font-size: 12px; color: #555;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; font-family: inherit; margin-bottom: -1px; white-space: nowrap;
+}
+.sw-btn.on { color: #D7DADC; border-bottom-color: #D7DADC; }
+
+.page { display: none; padding-top: 38px; min-height: 100vh; }
+.page.on { display: block; }
+
+/* ── shared pieces ── */
+.tag { display: inline-block; font-size: 11px; padding: 2px 7px; border: 1px solid #222; border-radius: 10px; color: #818384; }
+.meta { font-size: 12px; color: #555; }
+
+/* ── shared post card ── */
+.post { padding: 13px 0; border-bottom: 1px solid #141415; display: grid; grid-template-columns: 1fr 48px; gap: 14px; align-items: start; }
+.p-co { font-size: 12px; color: #444; margin-bottom: 4px; }
+.p-title { font-size: 15px; color: #D7DADC; line-height: 1.35; margin-bottom: 5px; font-weight: 400; }
+.p-body { font-size: 13px; color: #333; line-height: 1.6; margin-bottom: 7px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.p-meta { display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+.p-right { text-align: right; }
+.p-score { font-size: 13px; color: #818384; display: block; margin-bottom: 3px; }
+.p-cmt { font-size: 12px; color: #444; display: block; }
+
+/* ── shared navbar base ── */
+.navbar {
+  position: sticky; top: 38px; z-index: 100;
+  background: #0D0D0D; border-bottom: 1px solid #1a1a1b;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 20px; height: 48px;
+}
+.logo { font-size: 16px; font-weight: 700; }
+.search-box {
+  height: 32px; background: #111; border: 1px solid #1e1f20; border-radius: 5px;
+  display: flex; align-items: center; padding: 0 10px; gap: 7px;
+}
+.search-box span { font-size: 13px; color: #444; }
+.btn-login { padding: 5px 14px; border-radius: 20px; border: 1px solid #222; font-size: 13px; color: #818384; background: none; }
+.btn-signup { padding: 5px 14px; border-radius: 20px; border: none; font-size: 13px; color: #0D0D0D; background: #D7DADC; }
+
+/* ── shared 3col body ── */
+.body3 { display: flex; }
+.feed { flex: 1; min-width: 0; padding: 14px 20px; }
+.feed-top { display: flex; gap: 6px; margin-bottom: 12px; align-items: center; }
+.ftab { padding: 4px 12px; border-radius: 4px; border: 1px solid #1a1a1b; font-size: 13px; color: #818384; background: none; }
+.ftab.on { color: #D7DADC; border-color: #2e2e30; }
+
+/* ── shared right sidebar ── */
+.rsb { width: 252px; min-width: 252px; border-left: 1px solid #1a1a1b; padding: 14px 16px; }
+.rsb-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+.rsb-sec { padding-bottom: 14px; margin-bottom: 14px; border-bottom: 1px solid #141415; }
+.rsb-sec:last-child { border: none; padding: 0; margin: 0; }
+.rsb-post { padding: 6px 0; border-bottom: 1px solid #141415; }
+.rsb-post:last-child { border: none; }
+.rsb-post .t { font-size: 13px; color: #818384; line-height: 1.35; margin-bottom: 2px; }
+.rsb-post .m { font-size: 11px; color: #444; }
+.rsb-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #141415; font-size: 13px; }
+.rsb-row:last-child { border: none; }
+.rsb-row .n { color: #818384; }
+.rsb-row .c { color: #444; font-size: 11px; }
+.post-cta { display: block; width: 100%; text-align: center; padding: 7px; background: #fff; border-radius: 4px; color: #0D0D0D; font-size: 13px; border: none; margin-bottom: 8px; }
+.post-cta-o { display: block; width: 100%; text-align: center; padding: 6px; background: none; border-radius: 4px; color: #818384; font-size: 13px; border: 1px solid #1e1f20; }
+
+
+/* ═══════════════════════════════════════════
+   G — Linear 스타일 좌 사이드바
+   트리 구조 / 섹션 헤더 / 들여쓰기
+   ═══════════════════════════════════════════ */
+#pG .lsb {
+  width: 220px; min-width: 220px; border-right: 1px solid #1a1a1b;
+  padding: 12px 0;
+  position: sticky; top: 86px; align-self: flex-start; max-height: calc(100vh - 86px); overflow-y: auto;
+}
+#pG .ls-group { margin-bottom: 4px; }
+#pG .ls-group-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 12px 5px 14px; font-size: 11px; color: #444;
+  text-transform: uppercase; letter-spacing: 0.5px; cursor: pointer;
+}
+#pG .ls-group-header:hover { color: #818384; }
+#pG .ls-group-header .arrow { font-size: 9px; }
+#pG .ls-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 5px 12px 5px 22px; font-size: 13px; color: #818384; cursor: pointer;
+  border-left: 2px solid transparent; margin-left: 2px;
+}
+#pG .ls-item:hover { color: #D7DADC; }
+#pG .ls-item.on { color: #D7DADC; background: #0f0f0f; border-left-color: #D7DADC; }
+#pG .ls-item .ct { font-size: 11px; color: #333; }
+#pG .ls-sub {
+  padding: 4px 12px 4px 32px; font-size: 12px; color: #444; cursor: pointer;
+  display: flex; align-items: center; justify-content: space-between;
+}
+#pG .ls-sub:hover { color: #818384; }
+#pG .ls-divider { height: 1px; background: #141415; margin: 8px 14px; }
+#pG .ls-pinned { padding: 5px 12px 5px 14px; font-size: 13px; color: #818384; cursor: pointer; display: flex; align-items: center; justify-content: space-between; }
+#pG .ls-pinned.on { color: #D7DADC; }
+#pG .ls-pinned:hover { color: #D7DADC; }
+
+
+/* ═══════════════════════════════════════════
+   H — 스테이지-first 좌 사이드바
+   "무슨 일이 있었나"로 탐색 시작
+   ═══════════════════════════════════════════ */
+#pH .lsb {
+  width: 220px; min-width: 220px; border-right: 1px solid #1a1a1b;
+  padding: 12px 0;
+  position: sticky; top: 86px; align-self: flex-start; max-height: calc(100vh - 86px); overflow-y: auto;
+}
+#pH .ls-section { margin-bottom: 0; }
+#pH .ls-label { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.6px; padding: 10px 16px 4px; }
+#pH .ls-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px; font-size: 13px; color: #818384; cursor: pointer;
+}
+#pH .ls-item:hover { color: #D7DADC; background: #0f0f0f; }
+#pH .ls-item.on { color: #D7DADC; background: #0f0f0f; }
+#pH .ls-item .ic { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+#pH .ls-item .ct { margin-left: auto; font-size: 11px; color: #333; }
+#pH .ls-divider { height: 1px; background: #141415; margin: 6px 0; }
+
+/* stage icons as simple symbols */
+#pH .ls-item .ic-phone::before { content: "📞"; font-size: 12px; }
+#pH .ls-item .ic-onsite::before { content: "🏢"; font-size: 12px; }
+#pH .ls-item .ic-offer::before { content: "📄"; font-size: 12px; }
+#pH .ls-item .ic-ghost::before { content: "👻"; font-size: 12px; }
+#pH .ls-item .ic-apply::before { content: "📬"; font-size: 12px; }
+#pH .ls-item .ic-comp::before { content: "⬛"; font-size: 10px; }
+#pH .ls-item .ic-inv::before { content: "◈"; font-size: 12px; }
+#pH .ls-item .ic-home::before { content: "◉"; font-size: 10px; }
+
+
+/* ═══════════════════════════════════════════
+   I — 탭 전환형 좌 사이드바
+   Companies / Investors / You 탭
+   ═══════════════════════════════════════════ */
+#pI .lsb {
+  width: 220px; min-width: 220px; border-right: 1px solid #1a1a1b;
+  display: flex; flex-direction: column;
+  position: sticky; top: 86px; align-self: flex-start; max-height: calc(100vh - 86px);
+}
+#pI .ls-tabs { display: flex; border-bottom: 1px solid #1a1a1b; flex-shrink: 0; }
+#pI .ls-tab {
+  flex: 1; padding: 10px 4px; font-size: 12px; color: #555; text-align: center;
+  background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; cursor: pointer;
+}
+#pI .ls-tab.on { color: #D7DADC; border-bottom-color: #D7DADC; }
+#pI .ls-body { flex: 1; overflow-y: auto; padding: 8px 0; }
+#pI .ls-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 16px; font-size: 13px; color: #818384; cursor: pointer;
+}
+#pI .ls-item:hover { color: #D7DADC; background: #0f0f0f; }
+#pI .ls-item.on { color: #D7DADC; background: #0f0f0f; }
+#pI .ls-item .ct { font-size: 11px; color: #333; }
+#pI .ls-search { padding: 8px 12px; }
+#pI .ls-search input {
+  width: 100%; background: #111; border: 1px solid #1e1f20; border-radius: 4px;
+  padding: 5px 10px; font-size: 12px; color: #D7DADC; outline: none; font-family: inherit;
+}
+#pI .ls-label { font-size: 10px; color: #333; text-transform: uppercase; letter-spacing: 0.6px; padding: 8px 16px 4px; }
+
+
+/* ═══════════════════════════════════════════
+   J — 텍스트-only 극단적 미니멀 좌 사이드바
+   아이콘 없음 / 들여쓰기 계층만
+   ═══════════════════════════════════════════ */
+#pJ .lsb {
+  width: 200px; min-width: 200px; border-right: 1px solid #141415;
+  padding: 16px 0;
+  position: sticky; top: 86px; align-self: flex-start; max-height: calc(100vh - 86px); overflow-y: auto;
+}
+#pJ .ls-head { padding: 4px 16px; font-size: 11px; color: #333; letter-spacing: 0.5px; margin-top: 10px; }
+#pJ .ls-head:first-child { margin-top: 0; }
+#pJ .ls-item { padding: 5px 16px; font-size: 13px; color: #555; cursor: pointer; display: flex; justify-content: space-between; }
+#pJ .ls-item:hover { color: #D7DADC; }
+#pJ .ls-item.on { color: #D7DADC; }
+#pJ .ls-item .ct { font-size: 11px; color: #2e2e30; }
+#pJ .ls-sub { padding: 4px 16px 4px 28px; font-size: 12px; color: #444; cursor: pointer; display: flex; justify-content: space-between; }
+#pJ .ls-sub:hover { color: #818384; }
+#pJ .ls-divider { height: 1px; background: #141415; margin: 10px 16px; }
+
+
+/* right sidebar compact variant */
+.rsb-compact { width: 220px; min-width: 220px; }
+</style>
+</head>
+<body>
+
+<div class="sw">
+  <span class="sw-label">3-column</span>
+  <button class="sw-btn on" onclick="show('pG',this)">G — Linear 트리</button>
+  <button class="sw-btn" onclick="show('pH',this)">H — 스테이지 first</button>
+  <button class="sw-btn" onclick="show('pI',this)">I — 탭 전환</button>
+  <button class="sw-btn" onclick="show('pJ',this)">J — 텍스트 only</button>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     G — Linear 스타일  좌: 트리 계층 구조
+     ═══════════════════════════════════════════════ -->
+<div id="pG" class="page on">
+  <div class="navbar">
+    <span class="logo">Faildit</span>
+    <div class="search-box" style="flex:1;max-width:360px;margin-left:8px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-login">Log in</button>
+      <button class="btn-signup">Sign up</button>
+    </div>
+  </div>
+
+  <div class="body3">
+    <!-- Left: Linear tree -->
+    <aside class="lsb" id="pG">
+      <div class="ls-pinned on">Home</div>
+      <div class="ls-pinned">Popular</div>
+      <div class="ls-divider"></div>
+
+      <div class="ls-group">
+        <div class="ls-group-header">Companies <span class="arrow">▾</span></div>
+        <div class="ls-item on">All <span class="ct">9,304</span></div>
+        <div class="ls-item">Google <span class="ct">1,204</span></div>
+        <div class="ls-sub">SWE <span class="ct">891</span></div>
+        <div class="ls-sub">PM <span class="ct">203</span></div>
+        <div class="ls-sub">Design <span class="ct">110</span></div>
+        <div class="ls-item">Meta <span class="ct">876</span></div>
+        <div class="ls-item">Amazon <span class="ct">731</span></div>
+        <div class="ls-item">Stripe <span class="ct">412</span></div>
+        <div class="ls-item">OpenAI <span class="ct">388</span></div>
+        <div class="ls-item">Apple <span class="ct">341</span></div>
+        <div class="ls-item" style="color:#333;font-size:12px;">+ 243 more</div>
+      </div>
+
+      <div class="ls-divider"></div>
+
+      <div class="ls-group">
+        <div class="ls-group-header">Investors <span class="arrow">▾</span></div>
+        <div class="ls-item">All <span class="ct">5,517</span></div>
+        <div class="ls-item">Y Combinator <span class="ct">2,341</span></div>
+        <div class="ls-sub">Batch W25 <span class="ct">412</span></div>
+        <div class="ls-sub">Batch S24 <span class="ct">389</span></div>
+        <div class="ls-item">Sequoia <span class="ct">493</span></div>
+        <div class="ls-item">a16z <span class="ct">388</span></div>
+        <div class="ls-item">Lightspeed <span class="ct">271</span></div>
+        <div class="ls-item" style="color:#333;font-size:12px;">+ 86 more</div>
+      </div>
+
+      <div class="ls-divider"></div>
+
+      <div class="ls-group">
+        <div class="ls-group-header">You <span class="arrow">▾</span></div>
+        <div class="ls-item">My Posts</div>
+        <div class="ls-item">Saved</div>
+        <div class="ls-item">Settings</div>
+      </div>
+    </aside>
+
+    <!-- Feed -->
+    <div class="feed">
+      <div class="feed-top">
+        <button class="ftab on">New</button>
+        <button class="ftab">Top</button>
+        <button class="ftab">Hot</button>
+      </div>
+      <div class="post"><div><div class="p-co">companies/meta · SWE · Offer Rescinded</div><div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데.</div><div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div></div><div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/yc · Batch W25 · Application</div><div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 전혀 없음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div></div><div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/google · SWE · Onsite</div><div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div><div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락.</div><div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div></div><div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/sequoia · Series A · Partner Meeting</div><div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div><div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div></div><div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/amazon · SWE · Onsite</div><div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div><div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div></div><div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/stripe · PM · Phone Screen</div><div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div><div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div></div><div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/a16z · Pre-seed · Intro Call</div><div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div><div class="p-body">첫 콜 15분 만에 "지금 우리가 보는 팀 프로필이 아니다"라고. 덱도 제대로 안 봤을 것 같은 느낌.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 3d ago · 33 comments</span></div></div><div class="p-right"><span class="p-score">↑ 76</span><span class="p-cmt">33 💬</span></div></div>
+    </div>
+
+    <!-- Right sidebar -->
+    <aside class="rsb">
+      <div class="rsb-sec"><button class="post-cta">+ Post a Rejection</button></div>
+      <div class="rsb-sec"><div class="rsb-title">Trending</div><div class="rsb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div><div class="rsb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 거절</div><div class="m">investors/yc · ↑ 341</div></div><div class="rsb-post"><div class="t">L5 onsite 5라운드 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div></div>
+      <div class="rsb-sec"><div class="rsb-title">Top communities</div><div class="rsb-row"><span class="n">investors/yc</span><span class="c">2,341</span></div><div class="rsb-row"><span class="n">companies/google</span><span class="c">1,204</span></div><div class="rsb-row"><span class="n">companies/meta</span><span class="c">876</span></div><div class="rsb-row"><span class="n">companies/amazon</span><span class="c">731</span></div><div style="margin-top:8px;font-size:12px;color:#333;">View all 338 →</div></div>
+      <div class="rsb-sec"><div class="rsb-title">This week</div><div class="rsb-row"><span class="n">Total posts</span><span class="c">+342</span></div><div class="rsb-row"><span class="n">Communities</span><span class="c">338</span></div></div>
+      <div style="font-size:11px;color:#2e2e30;line-height:2.2;">Help · About · Privacy · Terms<br>Faildit © 2026</div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     H — 스테이지-first  좌: 결과 유형으로 탐색
+     ═══════════════════════════════════════════════ -->
+<div id="pH" class="page">
+  <div class="navbar">
+    <span class="logo">Faildit</span>
+    <div class="search-box" style="flex:1;max-width:360px;margin-left:8px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-login">Log in</button>
+      <button class="btn-signup">Sign up</button>
+    </div>
+  </div>
+
+  <div class="body3">
+    <!-- Left: stage-first -->
+    <aside class="lsb" id="pH">
+      <div class="ls-section">
+        <div class="ls-item on">
+          <div class="ic ic-home"></div> All Stories
+          <span class="ct">14,821</span>
+        </div>
+      </div>
+
+      <div class="ls-divider"></div>
+
+      <div class="ls-section">
+        <div class="ls-label">What happened?</div>
+        <div class="ls-item">
+          <div class="ic ic-ghost"></div> Ghosted
+          <span class="ct">3,021</span>
+        </div>
+        <div class="ls-item">
+          <div class="ic ic-onsite"></div> Rejected after Onsite
+          <span class="ct">4,883</span>
+        </div>
+        <div class="ls-item">
+          <div class="ic ic-phone"></div> Rejected at Phone Screen
+          <span class="ct">2,110</span>
+        </div>
+        <div class="ls-item">
+          <div class="ic ic-offer"></div> Offer Rescinded
+          <span class="ct">891</span>
+        </div>
+        <div class="ls-item">
+          <div class="ic ic-apply"></div> Not Shortlisted
+          <span class="ct">3,916</span>
+        </div>
+      </div>
+
+      <div class="ls-divider"></div>
+
+      <div class="ls-section">
+        <div class="ls-label">Where?</div>
+        <div class="ls-item">
+          <div class="ic ic-comp"></div> Companies
+          <span class="ct">9,304</span>
+        </div>
+        <div class="ls-item">
+          <div class="ic ic-inv"></div> Investors
+          <span class="ct">5,517</span>
+        </div>
+      </div>
+
+      <div class="ls-divider"></div>
+
+      <div class="ls-section">
+        <div class="ls-label">Top Companies</div>
+        <div class="ls-item" style="padding-left:16px;">Google <span class="ct">1,204</span></div>
+        <div class="ls-item" style="padding-left:16px;">Meta <span class="ct">876</span></div>
+        <div class="ls-item" style="padding-left:16px;">Amazon <span class="ct">731</span></div>
+        <div class="ls-item" style="padding-left:16px;">YC <span class="ct">2,341</span></div>
+        <div class="ls-item" style="padding-left:16px;color:#333;font-size:12px;">+ 334 more</div>
+      </div>
+    </aside>
+
+    <!-- Feed -->
+    <div class="feed">
+      <div class="feed-top">
+        <button class="ftab on">New</button>
+        <button class="ftab">Top</button>
+        <button class="ftab">Hot</button>
+      </div>
+      <div class="post"><div><div class="p-co">companies/meta · SWE · Offer Rescinded</div><div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데.</div><div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div></div><div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/yc · Batch W25 · Application</div><div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 전혀 없음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div></div><div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/google · SWE · Onsite</div><div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div><div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락.</div><div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div></div><div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/sequoia · Series A · Partner Meeting</div><div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div><div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div></div><div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/amazon · SWE · Onsite</div><div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div><div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div></div><div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/stripe · PM · Phone Screen</div><div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div><div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div></div><div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/a16z · Pre-seed · Intro Call</div><div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div><div class="p-body">첫 콜 15분 만에 "지금 우리가 보는 팀 프로필이 아니다"라고. 덱도 제대로 안 봤을 것 같은 느낌.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 3d ago · 33 comments</span></div></div><div class="p-right"><span class="p-score">↑ 76</span><span class="p-cmt">33 💬</span></div></div>
+    </div>
+
+    <!-- Right sidebar -->
+    <aside class="rsb">
+      <div class="rsb-sec"><button class="post-cta">+ Post a Rejection</button></div>
+      <div class="rsb-sec"><div class="rsb-title">Trending</div><div class="rsb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div><div class="rsb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 거절</div><div class="m">investors/yc · ↑ 341</div></div><div class="rsb-post"><div class="t">L5 onsite 5라운드 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div></div>
+      <div class="rsb-sec"><div class="rsb-title">Top communities</div><div class="rsb-row"><span class="n">investors/yc</span><span class="c">2,341</span></div><div class="rsb-row"><span class="n">companies/google</span><span class="c">1,204</span></div><div class="rsb-row"><span class="n">companies/meta</span><span class="c">876</span></div><div class="rsb-row"><span class="n">companies/amazon</span><span class="c">731</span></div><div style="margin-top:8px;font-size:12px;color:#333;">View all 338 →</div></div>
+      <div class="rsb-sec"><div class="rsb-title">This week</div><div class="rsb-row"><span class="n">Total posts</span><span class="c">+342</span></div><div class="rsb-row"><span class="n">New communities</span><span class="c">+12</span></div></div>
+      <div style="font-size:11px;color:#2e2e30;line-height:2.2;">Help · About · Privacy · Terms<br>Faildit © 2026</div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     I — 탭 전환형  좌: Companies | Investors | You
+     ═══════════════════════════════════════════════ -->
+<div id="pI" class="page">
+  <div class="navbar">
+    <span class="logo">Faildit</span>
+    <div class="search-box" style="flex:1;max-width:360px;margin-left:8px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-login">Log in</button>
+      <button class="btn-signup">Sign up</button>
+    </div>
+  </div>
+
+  <div class="body3">
+    <!-- Left: tab switcher -->
+    <aside class="lsb" id="pI">
+      <div class="ls-tabs">
+        <button class="ls-tab on" onclick="switchTab(this,'tabCo')">Jobs</button>
+        <button class="ls-tab" onclick="switchTab(this,'tabInv')">Invest</button>
+        <button class="ls-tab" onclick="switchTab(this,'tabYou')">You</button>
+      </div>
+      <div class="ls-body">
+        <!-- Companies tab -->
+        <div id="tabCo">
+          <div class="ls-search"><input type="text" placeholder="Filter companies…" /></div>
+          <div class="ls-label">All</div>
+          <div class="ls-item on">All Companies <span class="ct">9,304</span></div>
+          <div class="ls-label">Top</div>
+          <div class="ls-item">Google <span class="ct">1,204</span></div>
+          <div class="ls-item">Meta <span class="ct">876</span></div>
+          <div class="ls-item">Amazon <span class="ct">731</span></div>
+          <div class="ls-item">Stripe <span class="ct">412</span></div>
+          <div class="ls-item">OpenAI <span class="ct">388</span></div>
+          <div class="ls-item">Apple <span class="ct">341</span></div>
+          <div class="ls-item">Netflix <span class="ct">298</span></div>
+          <div class="ls-item">Airbnb <span class="ct">267</span></div>
+          <div class="ls-item">Anthropic <span class="ct">203</span></div>
+          <div class="ls-item">Figma <span class="ct">178</span></div>
+          <div class="ls-item">Linear <span class="ct">144</span></div>
+          <div class="ls-item" style="color:#333;font-size:12px;">+ 237 more</div>
+        </div>
+        <!-- Investors tab (hidden by default) -->
+        <div id="tabInv" style="display:none;">
+          <div class="ls-search"><input type="text" placeholder="Filter investors…" /></div>
+          <div class="ls-label">All</div>
+          <div class="ls-item on">All Investors <span class="ct">5,517</span></div>
+          <div class="ls-label">Top</div>
+          <div class="ls-item">Y Combinator <span class="ct">2,341</span></div>
+          <div class="ls-item">Sequoia <span class="ct">493</span></div>
+          <div class="ls-item">a16z <span class="ct">388</span></div>
+          <div class="ls-item">Lightspeed <span class="ct">271</span></div>
+          <div class="ls-item">Benchmark <span class="ct">198</span></div>
+          <div class="ls-item">Accel <span class="ct">156</span></div>
+          <div class="ls-item">GV <span class="ct">143</span></div>
+          <div class="ls-item" style="color:#333;font-size:12px;">+ 83 more</div>
+        </div>
+        <!-- You tab -->
+        <div id="tabYou" style="display:none;">
+          <div class="ls-label">Account</div>
+          <div class="ls-item">Log In</div>
+          <div class="ls-item">Sign Up</div>
+          <div class="ls-label">Activity</div>
+          <div class="ls-item">My Posts</div>
+          <div class="ls-item">Saved</div>
+          <div class="ls-label">Settings</div>
+          <div class="ls-item">Preferences</div>
+          <div class="ls-item">Help</div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Feed -->
+    <div class="feed">
+      <div class="feed-top">
+        <button class="ftab on">New</button>
+        <button class="ftab">Top</button>
+        <button class="ftab">Hot</button>
+      </div>
+      <div class="post"><div><div class="p-co">companies/meta · SWE · Offer Rescinded</div><div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데.</div><div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div></div><div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/yc · Batch W25 · Application</div><div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 전혀 없음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div></div><div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/google · SWE · Onsite</div><div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div><div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락.</div><div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div></div><div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/sequoia · Series A · Partner Meeting</div><div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div><div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div></div><div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/amazon · SWE · Onsite</div><div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div><div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div></div><div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/stripe · PM · Phone Screen</div><div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div><div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div></div><div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div></div>
+    </div>
+
+    <!-- Right sidebar -->
+    <aside class="rsb">
+      <div class="rsb-sec"><button class="post-cta">+ Post a Rejection</button></div>
+      <div class="rsb-sec"><div class="rsb-title">Trending</div><div class="rsb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div><div class="rsb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 거절</div><div class="m">investors/yc · ↑ 341</div></div><div class="rsb-post"><div class="t">L5 onsite 5라운드 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div></div>
+      <div class="rsb-sec"><div class="rsb-title">This week by stage</div><div class="rsb-row"><span class="n">Ghosted</span><span class="c">+89</span></div><div class="rsb-row"><span class="n">Onsite Reject</span><span class="c">+134</span></div><div class="rsb-row"><span class="n">Offer Rescinded</span><span class="c">+34</span></div><div class="rsb-row"><span class="n">Not Shortlisted</span><span class="c">+85</span></div></div>
+      <div style="font-size:11px;color:#2e2e30;line-height:2.2;">Help · About · Privacy · Terms<br>Faildit © 2026</div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════
+     J — 텍스트 only  좌: 아이콘 없이 계층 텍스트만
+     ═══════════════════════════════════════════════ -->
+<div id="pJ" class="page">
+  <div class="navbar">
+    <span class="logo">Faildit</span>
+    <div class="search-box" style="flex:1;max-width:360px;margin-left:8px;">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:8px;">
+      <button class="btn-login">Log in</button>
+      <button class="btn-signup">Sign up</button>
+    </div>
+  </div>
+
+  <div class="body3">
+    <!-- Left: text-only minimal -->
+    <aside class="lsb" id="pJ">
+      <div class="ls-item on">Home <span class="ct">14,821</span></div>
+      <div class="ls-item">Popular</div>
+      <div class="ls-divider"></div>
+      <div class="ls-head">Companies</div>
+      <div class="ls-item">All <span class="ct">9,304</span></div>
+      <div class="ls-item">Google <span class="ct">1,204</span></div>
+      <div class="ls-sub">SWE <span class="ct">891</span></div>
+      <div class="ls-sub">PM <span class="ct">203</span></div>
+      <div class="ls-item">Meta <span class="ct">876</span></div>
+      <div class="ls-item">Amazon <span class="ct">731</span></div>
+      <div class="ls-item">Stripe <span class="ct">412</span></div>
+      <div class="ls-item">OpenAI <span class="ct">388</span></div>
+      <div class="ls-item">Apple <span class="ct">341</span></div>
+      <div class="ls-item" style="color:#2e2e30;font-size:12px;">+ 243 more</div>
+      <div class="ls-divider"></div>
+      <div class="ls-head">Investors</div>
+      <div class="ls-item">All <span class="ct">5,517</span></div>
+      <div class="ls-item">YC <span class="ct">2,341</span></div>
+      <div class="ls-sub">W25 <span class="ct">412</span></div>
+      <div class="ls-sub">S24 <span class="ct">389</span></div>
+      <div class="ls-item">Sequoia <span class="ct">493</span></div>
+      <div class="ls-item">a16z <span class="ct">388</span></div>
+      <div class="ls-item" style="color:#2e2e30;font-size:12px;">+ 86 more</div>
+      <div class="ls-divider"></div>
+      <div class="ls-head">Stage</div>
+      <div class="ls-item">Ghosted <span class="ct">3,021</span></div>
+      <div class="ls-item">Onsite <span class="ct">4,883</span></div>
+      <div class="ls-item">Phone Screen <span class="ct">2,110</span></div>
+      <div class="ls-item">Offer Rescinded <span class="ct">891</span></div>
+    </aside>
+
+    <!-- Feed -->
+    <div class="feed">
+      <div class="feed-top">
+        <button class="ftab on">New</button>
+        <button class="ftab">Top</button>
+        <button class="ftab">Hot</button>
+      </div>
+      <div class="post"><div><div class="p-co">companies/meta · SWE · Offer Rescinded</div><div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데.</div><div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div></div><div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/yc · Batch W25 · Application</div><div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 전혀 없음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div></div><div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/google · SWE · Onsite</div><div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div><div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락.</div><div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div></div><div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/sequoia · Series A · Partner Meeting</div><div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div><div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div></div><div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/amazon · SWE · Onsite</div><div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div><div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div></div><div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div></div>
+      <div class="post"><div><div class="p-co">companies/stripe · PM · Phone Screen</div><div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div><div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div></div><div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div></div>
+      <div class="post"><div><div class="p-co">investors/a16z · Pre-seed · Intro Call</div><div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div><div class="p-body">첫 콜 15분 만에 "지금 우리가 보는 팀 프로필이 아니다"라고. 덱도 제대로 안 봤을 것 같은 느낌.</div><div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 3d ago · 33 comments</span></div></div><div class="p-right"><span class="p-score">↑ 76</span><span class="p-cmt">33 💬</span></div></div>
+    </div>
+
+    <!-- Right sidebar -->
+    <aside class="rsb">
+      <div class="rsb-sec"><button class="post-cta">+ Post a Rejection</button></div>
+      <div class="rsb-sec"><div class="rsb-title">Trending</div><div class="rsb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div><div class="rsb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 거절</div><div class="m">investors/yc · ↑ 341</div></div><div class="rsb-post"><div class="t">L5 onsite 5라운드 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div></div>
+      <div class="rsb-sec"><div class="rsb-title">Top communities</div><div class="rsb-row"><span class="n">investors/yc</span><span class="c">2,341</span></div><div class="rsb-row"><span class="n">companies/google</span><span class="c">1,204</span></div><div class="rsb-row"><span class="n">companies/meta</span><span class="c">876</span></div><div class="rsb-row"><span class="n">companies/amazon</span><span class="c">731</span></div><div style="margin-top:8px;font-size:12px;color:#333;">View all 338 →</div></div>
+      <div class="rsb-sec"><div class="rsb-title">Stats</div><div class="rsb-row"><span class="n">Total</span><span class="c">14,821</span></div><div class="rsb-row"><span class="n">This week</span><span class="c">+342</span></div><div class="rsb-row"><span class="n">Communities</span><span class="c">338</span></div></div>
+      <div style="font-size:11px;color:#2e2e30;line-height:2.2;">Help · About · Privacy · Terms<br>Faildit © 2026</div>
+    </aside>
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo(0,0);
+}
+function switchTab(btn, tabId) {
+  ['tabCo','tabInv','tabYou'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  btn.closest('.lsb').querySelectorAll('.ls-tab').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById(tabId).style.display = 'block';
+}
+</script>
+</body>
+</html>

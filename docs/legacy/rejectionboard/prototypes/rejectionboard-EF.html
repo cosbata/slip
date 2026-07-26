@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RejectionBoard — E & F Layouts</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0D0D0D; color: #D7DADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+a { text-decoration: none; color: inherit; }
+button { font-family: inherit; cursor: pointer; }
+
+.switcher {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: #050505; border-bottom: 1px solid #272729;
+  display: flex; align-items: center; padding: 0 20px; height: 38px; gap: 0;
+}
+.sw-label { font-size: 11px; color: #444; margin-right: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+.sw-btn {
+  padding: 0 20px; height: 38px; font-size: 12px; color: #555;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; font-family: inherit; margin-bottom: -1px;
+}
+.sw-btn.on { color: #D7DADC; border-bottom-color: #D7DADC; }
+.sw-desc { margin-left: auto; font-size: 11px; color: #333; }
+
+.page { display: none; padding-top: 38px; min-height: 100vh; }
+.page.on { display: block; }
+
+.tag {
+  display: inline-block; font-size: 11px; padding: 2px 8px;
+  border: 1px solid #2a2a2c; border-radius: 10px; color: #818384;
+}
+.meta { font-size: 12px; color: #555; }
+
+
+/* ══════════════════════════════════════════════════════
+   E — 상단 2중 바 (Linear / Notion 스타일)
+   사이드바 없음 / 탐색 전부 상단에
+   ══════════════════════════════════════════════════════ */
+
+/* ── Sticky double navbar ── */
+#pE .nav1 {
+  position: sticky; top: 38px; z-index: 100;
+  background: #0D0D0D;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 24px; height: 52px;
+  border-bottom: 1px solid #1a1a1b;
+}
+#pE .nav1 .logo { font-size: 17px; font-weight: 700; margin-right: 8px; flex-shrink: 0; }
+#pE .nav1 .search {
+  flex: 1; max-width: 520px; height: 34px;
+  background: #141415; border: 1px solid #272729; border-radius: 6px;
+  display: flex; align-items: center; padding: 0 12px; gap: 8px;
+  transition: border-color .15s;
+}
+#pE .nav1 .search:hover { border-color: #3a3a3c; }
+#pE .nav1 .search svg { flex-shrink: 0; }
+#pE .nav1 .search span { font-size: 13px; color: #444; }
+#pE .nav1 .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+#pE .nav1 .right .login {
+  padding: 5px 16px; border-radius: 20px; border: 1px solid #2a2a2c;
+  font-size: 13px; color: #818384; background: none;
+}
+#pE .nav1 .right .signup {
+  padding: 5px 16px; border-radius: 20px; border: none;
+  font-size: 13px; color: #0D0D0D; background: #D7DADC;
+}
+
+#pE .nav2 {
+  position: sticky; top: 90px; z-index: 100;
+  background: #0D0D0D;
+  display: flex; align-items: center; gap: 0;
+  padding: 0 24px; height: 42px;
+  border-bottom: 1px solid #1a1a1b;
+  overflow-x: auto; scrollbar-width: none;
+}
+#pE .nav2::-webkit-scrollbar { display: none; }
+#pE .nav2 .section-divider {
+  width: 1px; height: 20px; background: #1e1f20; margin: 0 8px; flex-shrink: 0;
+}
+#pE .nav2-tab {
+  padding: 0 14px; height: 42px; font-size: 13px; color: #818384;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  white-space: nowrap; flex-shrink: 0; margin-bottom: -1px;
+}
+#pE .nav2-tab.on { color: #D7DADC; border-bottom-color: #D7DADC; }
+#pE .nav2-tab:hover { color: #D7DADC; }
+#pE .nav2-pill {
+  padding: 4px 12px; height: 26px; font-size: 12px; color: #818384;
+  background: none; border: 1px solid #1e1f20; border-radius: 13px;
+  white-space: nowrap; flex-shrink: 0; margin: 0 3px;
+  display: flex; align-items: center;
+}
+#pE .nav2-pill:hover { color: #D7DADC; border-color: #343536; }
+#pE .nav2-pill.on { color: #D7DADC; border-color: #555; }
+
+/* ── Content ── */
+#pE .content {
+  max-width: 1060px; margin: 0 auto;
+  display: flex; gap: 0; padding: 0 24px;
+}
+#pE .feed { flex: 1; min-width: 0; padding: 16px 0; }
+#pE .feed-sort { display: flex; gap: 6px; margin-bottom: 14px; align-items: center; }
+#pE .sort-btn {
+  display: flex; align-items: center; gap: 4px;
+  padding: 5px 12px; border-radius: 4px; border: 1px solid #1e1f20;
+  font-size: 13px; color: #818384; background: none;
+}
+#pE .sort-btn.on { color: #D7DADC; border-color: #343536; }
+#pE .sort-btn svg { opacity: .5; }
+
+#pE .post {
+  padding: 14px 0;
+  border-bottom: 1px solid #141415;
+  display: grid; grid-template-columns: 1fr 52px; gap: 16px; align-items: start;
+}
+#pE .p-co { font-size: 12px; color: #444; margin-bottom: 5px; display: flex; gap: 6px; align-items: center; }
+#pE .p-co .dot { width: 5px; height: 5px; border-radius: 50%; background: #2e2e30; flex-shrink: 0; }
+#pE .p-title { font-size: 15px; color: #D7DADC; line-height: 1.35; margin-bottom: 6px; font-weight: 400; }
+#pE .p-body { font-size: 13px; color: #3a3a3c; line-height: 1.6; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#pE .p-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#pE .p-right { text-align: right; }
+#pE .p-score { font-size: 14px; color: #818384; display: block; margin-bottom: 4px; }
+#pE .p-cmt { font-size: 12px; color: #444; display: block; }
+
+/* ── Right sidebar ── */
+#pE .sidebar {
+  width: 280px; min-width: 280px; padding: 16px 0 16px 24px;
+  border-left: 1px solid #1a1a1b; margin-left: 24px;
+}
+#pE .sb-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+#pE .sb-section { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid #141415; }
+#pE .sb-section:last-child { border: none; margin: 0; padding: 0; }
+#pE .sb-post { padding: 7px 0; border-bottom: 1px solid #141415; }
+#pE .sb-post:last-child { border: none; }
+#pE .sb-post .t { font-size: 13px; color: #818384; line-height: 1.35; margin-bottom: 2px; }
+#pE .sb-post .m { font-size: 11px; color: #444; }
+#pE .sb-item { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid #141415; font-size: 13px; }
+#pE .sb-item:last-child { border: none; }
+#pE .sb-item .n { color: #818384; }
+#pE .sb-item .c { color: #444; font-size: 12px; }
+#pE .post-btn {
+  display: block; width: 100%; text-align: center; padding: 7px;
+  background: #fff; border-radius: 4px; color: #0D0D0D;
+  font-size: 13px; border: none; margin-bottom: 8px;
+}
+#pE .post-btn-outline {
+  display: block; width: 100%; text-align: center; padding: 6px;
+  background: none; border-radius: 4px; color: #818384;
+  font-size: 13px; border: 1px solid #2a2a2c;
+}
+
+
+/* ══════════════════════════════════════════════════════
+   F — 슬림 아이콘 사이드바 (Slack / Figma 스타일)
+   좌 48px 아이콘 바 / 클릭시 패널 확장
+   ══════════════════════════════════════════════════════ */
+
+#pF .navbar {
+  position: sticky; top: 38px; z-index: 100;
+  background: #0D0D0D; border-bottom: 1px solid #1a1a1b;
+  display: flex; align-items: center; gap: 12px;
+  padding: 0 16px; height: 48px;
+}
+#pF .navbar .logo { font-size: 16px; font-weight: 700; }
+#pF .navbar .search {
+  flex: 1; max-width: 400px; height: 32px;
+  background: #141415; border: 1px solid #272729; border-radius: 5px;
+  display: flex; align-items: center; padding: 0 10px; gap: 7px; margin: 0 auto;
+}
+#pF .navbar .search span { font-size: 13px; color: #444; }
+#pF .navbar .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+#pF .navbar .right .login { padding: 5px 14px; border-radius: 20px; border: 1px solid #2a2a2c; font-size: 13px; color: #818384; background: none; }
+#pF .navbar .right .signup { padding: 5px 14px; border-radius: 20px; border: none; font-size: 13px; color: #0D0D0D; background: #D7DADC; }
+
+#pF .layout {
+  display: flex; min-height: calc(100vh - 86px);
+}
+
+/* ── Icon bar ── */
+#pF .icon-bar {
+  width: 52px; min-width: 52px;
+  border-right: 1px solid #1a1a1b;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 12px 0; gap: 4px;
+  position: sticky; top: 86px; align-self: flex-start; height: calc(100vh - 86px);
+  overflow-y: auto;
+}
+#pF .icon-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  background: none; border: none; color: #444;
+  cursor: pointer; position: relative; transition: background .1s, color .1s;
+  font-size: 18px;
+}
+#pF .icon-btn:hover { background: #141415; color: #D7DADC; }
+#pF .icon-btn.on { background: #1e1f20; color: #D7DADC; }
+#pF .icon-btn .tooltip {
+  position: absolute; left: 46px; top: 50%; transform: translateY(-50%);
+  background: #1e1f20; color: #D7DADC; font-size: 12px; white-space: nowrap;
+  padding: 4px 8px; border-radius: 4px; pointer-events: none;
+  opacity: 0; transition: opacity .1s; z-index: 200;
+  border: 1px solid #2a2a2c;
+}
+#pF .icon-btn:hover .tooltip { opacity: 1; }
+#pF .icon-divider { width: 28px; height: 1px; background: #1a1a1b; margin: 4px 0; }
+#pF .icon-bar-bottom { margin-top: auto; }
+
+/* ── Expanded panel ── */
+#pF .panel {
+  width: 0; overflow: hidden; transition: width .2s ease;
+  border-right: 0px solid #1a1a1b;
+  background: #0D0D0D;
+  position: sticky; top: 86px; align-self: flex-start; height: calc(100vh - 86px);
+  overflow-y: auto;
+}
+#pF .panel.open {
+  width: 220px; min-width: 220px; border-right-width: 1px;
+}
+#pF .panel-inner { width: 220px; padding: 16px 0; }
+#pF .panel-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; padding: 4px 16px 8px; }
+#pF .panel-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 16px; font-size: 13px; color: #818384; cursor: pointer;
+}
+#pF .panel-item:hover { color: #D7DADC; background: #0f0f0f; }
+#pF .panel-item.on { color: #D7DADC; background: #111; }
+#pF .panel-item .ct { font-size: 11px; color: #444; }
+#pF .panel-sep { height: 1px; background: #141415; margin: 8px 0; }
+
+/* ── Main content ── */
+#pF .main-wrap {
+  flex: 1; min-width: 0;
+  display: flex;
+}
+#pF .feed {
+  flex: 1; min-width: 0; padding: 16px 20px;
+}
+#pF .feed-top { display: flex; gap: 6px; margin-bottom: 14px; align-items: center; }
+#pF .ftab {
+  padding: 5px 12px; border-radius: 4px; border: 1px solid #1e1f20;
+  font-size: 13px; color: #818384; background: none;
+}
+#pF .ftab.on { color: #D7DADC; border-color: #343536; }
+
+#pF .post {
+  padding: 14px 0; border-bottom: 1px solid #141415;
+  display: grid; grid-template-columns: 1fr 52px; gap: 16px; align-items: start;
+}
+#pF .p-co { font-size: 12px; color: #444; margin-bottom: 5px; display: flex; gap: 6px; align-items: center; }
+#pF .p-co .dot { width: 5px; height: 5px; border-radius: 50%; background: #2e2e30; }
+#pF .p-title { font-size: 15px; color: #D7DADC; line-height: 1.35; margin-bottom: 6px; font-weight: 400; }
+#pF .p-body { font-size: 13px; color: #3a3a3c; line-height: 1.6; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#pF .p-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#pF .p-right { text-align: right; }
+#pF .p-score { font-size: 14px; color: #818384; display: block; margin-bottom: 4px; }
+#pF .p-cmt { font-size: 12px; color: #444; display: block; }
+
+/* ── Right sidebar ── */
+#pF .sidebar {
+  width: 260px; min-width: 260px; padding: 16px;
+  border-left: 1px solid #1a1a1b;
+}
+#pF .sb-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+#pF .sb-section { padding-bottom: 16px; margin-bottom: 16px; border-bottom: 1px solid #141415; }
+#pF .sb-section:last-child { border: none; margin: 0; padding: 0; }
+#pF .sb-post { padding: 7px 0; border-bottom: 1px solid #141415; }
+#pF .sb-post:last-child { border: none; }
+#pF .sb-post .t { font-size: 13px; color: #818384; line-height: 1.35; margin-bottom: 2px; }
+#pF .sb-post .m { font-size: 11px; color: #444; }
+#pF .sb-item { display: flex; align-items: center; gap: 8px; padding: 5px 0; border-bottom: 1px solid #141415; font-size: 13px; }
+#pF .sb-item:last-child { border: none; }
+#pF .sb-item .av { width: 20px; height: 20px; border-radius: 50%; background: #1a1a1b; border: 1px solid #2a2a2c; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #444; flex-shrink: 0; }
+#pF .sb-item .nm { color: #818384; flex: 1; }
+#pF .sb-item .ct { color: #444; font-size: 11px; }
+#pF .post-btn { display: block; width: 100%; text-align: center; padding: 7px; background: #fff; border-radius: 4px; color: #0D0D0D; font-size: 13px; border: none; margin-bottom: 8px; }
+#pF .post-btn-o { display: block; width: 100%; text-align: center; padding: 6px; background: none; border-radius: 4px; color: #818384; font-size: 13px; border: 1px solid #2a2a2c; }
+
+/* ── Active community highlight in feed (for F) ── */
+#pF .active-context {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 0 14px; border-bottom: 1px solid #1a1a1b; margin-bottom: 4px;
+  font-size: 13px; color: #818384;
+}
+#pF .active-context .av { width: 24px; height: 24px; border-radius: 50%; background: #1a1a1b; border: 1px solid #2a2a2c; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #555; }
+#pF .active-context .name { color: #D7DADC; font-weight: 500; }
+#pF .active-context .close { margin-left: auto; font-size: 12px; color: #444; cursor: pointer; }
+
+/* Panel states annotation */
+.state-label {
+  font-size: 11px; color: #555; text-align: center; padding: 6px 0;
+  letter-spacing: 0.5px;
+}
+</style>
+</head>
+<body>
+
+<div class="switcher">
+  <span class="sw-label">Layout</span>
+  <button class="sw-btn on" onclick="show('pE',this)">E — 상단 2중 바</button>
+  <button class="sw-btn" onclick="show('pF',this)">F — 슬림 아이콘 사이드바</button>
+  <span class="sw-desc">상단 바로 전환</span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE E — 상단 2중 바
+     ══════════════════════════════════════════════════════ -->
+<div id="pE" class="page on">
+
+  <!-- Row 1: Logo + Search + Auth -->
+  <div class="nav1">
+    <span class="logo">Faildit</span>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search companies, investors, stories…</span>
+    </div>
+    <div class="right">
+      <button class="login">Log in</button>
+      <button class="signup">Sign up</button>
+    </div>
+  </div>
+
+  <!-- Row 2: Category tabs + Company pills -->
+  <div class="nav2">
+    <button class="nav2-tab on">All</button>
+    <button class="nav2-tab">Jobs</button>
+    <button class="nav2-tab">Investors</button>
+    <div class="section-divider"></div>
+    <button class="nav2-pill on">Google</button>
+    <button class="nav2-pill">Meta</button>
+    <button class="nav2-pill">YC</button>
+    <button class="nav2-pill">Sequoia</button>
+    <button class="nav2-pill">Amazon</button>
+    <button class="nav2-pill">Stripe</button>
+    <button class="nav2-pill">OpenAI</button>
+    <button class="nav2-pill">Apple</button>
+    <button class="nav2-pill">a16z</button>
+    <button class="nav2-pill">Airbnb</button>
+    <button class="nav2-pill">Lightspeed</button>
+    <button class="nav2-pill">Netflix</button>
+    <button class="nav2-pill">Anthropic</button>
+    <div class="section-divider"></div>
+    <button class="nav2-tab" style="color:#444;">+ 228 more</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content">
+    <div class="feed">
+      <div class="feed-sort">
+        <button class="sort-btn on">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>
+          New
+        </button>
+        <button class="sort-btn">Top</button>
+        <button class="sort-btn">Hot</button>
+        <div style="margin-left:auto;">
+          <button class="sort-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+            Compact
+          </button>
+        </div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>companies/meta · SWE · Offer Rescinded</div>
+          <div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div>
+          <div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데 막막함.</div>
+          <div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>investors/yc · Batch W25 · Application</div>
+          <div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div>
+          <div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 없음. 이전에도 한 번 지원해서 인터뷰까지 갔었는데.</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>companies/google · SWE · Onsite</div>
+          <div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div>
+          <div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락이 왔고 이유는 "전반적인 패키지 고려".</div>
+          <div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>investors/sequoia · Series A · Partner Meeting</div>
+          <div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div>
+          <div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no. "시장 사이즈가 우리 기대보다 작다"는 말을 3개월 만에 들음.</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>companies/amazon · SWE · Onsite</div>
+          <div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div>
+          <div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감. 어느 라운드인지도 안 알려줌. 리크루터도 연락이 끊김.</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>companies/stripe · PM · Phone Screen</div>
+          <div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div>
+          <div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음. 구체적으로 어떤 게 부족했을지 모르겠음.</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-co"><span class="dot"></span>investors/a16z · Pre-seed · Intro Call</div>
+          <div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div>
+          <div class="p-body">첫 콜 15분 만에 "지금 우리가 보는 팀 프로필이 아니다"라고. 덱도 제대로 안 봤을 것 같은 느낌. 첫 창업이면 a16z가 안 맞는건지.</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 3d ago · 33 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 76</span><span class="p-cmt">33 💬</span></div>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <aside class="sidebar">
+      <div class="sb-section">
+        <button class="post-btn">+ Post a Rejection</button>
+        <button class="post-btn-outline">Browse Communities</button>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">Trending</div>
+        <div class="sb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div>
+        <div class="sb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="m">investors/yc · ↑ 341</div></div>
+        <div class="sb-post"><div class="t">L5 onsite 5라운드 통과했는데 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">Top communities</div>
+        <div class="sb-item"><span class="n">companies/google</span><span class="c">1,204</span></div>
+        <div class="sb-item"><span class="n">investors/yc</span><span class="c">2,341</span></div>
+        <div class="sb-item"><span class="n">companies/meta</span><span class="c">876</span></div>
+        <div class="sb-item"><span class="n">investors/sequoia</span><span class="c">493</span></div>
+        <div class="sb-item"><span class="n">companies/amazon</span><span class="c">731</span></div>
+        <div style="margin-top:8px;font-size:12px;color:#444;">View all 338 →</div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-title">Stats</div>
+        <div class="sb-item"><span class="n">Total stories</span><span class="c">14,821</span></div>
+        <div class="sb-item"><span class="n">This week</span><span class="c">+342</span></div>
+      </div>
+      <div style="font-size:11px;color:#333;line-height:2.2;">
+        Help · About · Privacy · Terms<br>Faildit © 2026
+      </div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════
+     PAGE F — 슬림 아이콘 사이드바
+     ══════════════════════════════════════════════════════ -->
+<div id="pF" class="page">
+
+  <div class="navbar">
+    <span class="logo">Faildit</span>
+    <div class="search">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search</span>
+    </div>
+    <div class="right">
+      <button class="login">Log in</button>
+      <button class="signup">Sign up</button>
+    </div>
+  </div>
+
+  <div class="layout">
+
+    <!-- 48px icon bar -->
+    <div class="icon-bar">
+      <button class="icon-btn on" title="Home" onclick="closePanel()">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span class="tooltip">Home</span>
+      </button>
+      <button class="icon-btn" onclick="openPanel('search')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <span class="tooltip">Search</span>
+      </button>
+
+      <div class="icon-divider"></div>
+
+      <button class="icon-btn" onclick="openPanel('companies')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+        <span class="tooltip">Companies</span>
+      </button>
+      <button class="icon-btn" onclick="openPanel('investors')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        <span class="tooltip">Investors</span>
+      </button>
+      <button class="icon-btn" onclick="openPanel('trending')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        <span class="tooltip">Trending</span>
+      </button>
+
+      <div class="icon-divider"></div>
+
+      <div class="icon-bar-bottom">
+        <button class="icon-btn" onclick="openPanel('profile')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <span class="tooltip">Profile</span>
+        </button>
+        <button class="icon-btn" style="color:#D7DADC;background:#1a1a1b;" onclick="openPanel('post')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          <span class="tooltip">Post</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Expandable panel (changes based on active icon) -->
+    <div class="panel" id="fPanel">
+      <div class="panel-inner" id="fPanelInner">
+        <!-- content injected by JS -->
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="main-wrap">
+      <div class="feed">
+
+        <!-- When a panel is open, show context bar -->
+        <div class="active-context" id="fContext" style="display:none;">
+          <div class="av" id="fCtxAv">G</div>
+          <span class="name" id="fCtxName">companies/google</span>
+          <span class="meta" id="fCtxSub">1,204 posts</span>
+          <span class="close" onclick="closePanel()">✕ Clear filter</span>
+        </div>
+
+        <div class="feed-top">
+          <button class="ftab on">New</button>
+          <button class="ftab">Top</button>
+          <button class="ftab">Hot</button>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>companies/meta · SWE · Offer Rescinded</div>
+            <div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div>
+            <div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데.</div>
+            <div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 512</span><span class="p-cmt">88 💬</span></div>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>investors/yc · Batch W25 · Application</div>
+            <div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div>
+            <div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 전혀 없음.</div>
+            <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 341</span><span class="p-cmt">61 💬</span></div>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>companies/google · SWE · Onsite</div>
+            <div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div>
+            <div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락이 왔음.</div>
+            <div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 243</span><span class="p-cmt">42 💬</span></div>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>investors/sequoia · Series A · Partner Meeting</div>
+            <div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div>
+            <div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no.</div>
+            <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 189</span><span class="p-cmt">28 💬</span></div>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>companies/amazon · SWE · Onsite</div>
+            <div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div>
+            <div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감. 어느 라운드인지도 안 알려줌.</div>
+            <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 128</span><span class="p-cmt">47 💬</span></div>
+        </div>
+
+        <div class="post">
+          <div>
+            <div class="p-co"><span class="dot"></span>companies/stripe · PM · Phone Screen</div>
+            <div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div>
+            <div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음.</div>
+            <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div>
+          </div>
+          <div class="p-right"><span class="p-score">↑ 97</span><span class="p-cmt">15 💬</span></div>
+        </div>
+
+      </div>
+
+      <!-- Right sidebar -->
+      <aside class="sidebar">
+        <div class="sb-section">
+          <button class="post-btn">+ Post a Rejection</button>
+        </div>
+        <div class="sb-section">
+          <div class="sb-title">Trending</div>
+          <div class="sb-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div>
+          <div class="sb-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="m">investors/yc · ↑ 341</div></div>
+          <div class="sb-post"><div class="t">L5 onsite 5라운드 통과했는데 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div>
+        </div>
+        <div class="sb-section">
+          <div class="sb-title">Top communities</div>
+          <div class="sb-item"><div class="av">G</div><span class="nm">companies/google</span><span class="ct">1,204</span></div>
+          <div class="sb-item"><div class="av">Y</div><span class="nm">investors/yc</span><span class="ct">2,341</span></div>
+          <div class="sb-item"><div class="av">M</div><span class="nm">companies/meta</span><span class="ct">876</span></div>
+          <div class="sb-item"><div class="av">S</div><span class="nm">investors/sequoia</span><span class="ct">493</span></div>
+        </div>
+        <div style="font-size:11px;color:#333;line-height:2.2;">
+          Help · About · Privacy · Terms<br>Faildit © 2026
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo(0, 0);
+}
+
+const panels = {
+  companies: `
+    <div class="panel-title">Companies</div>
+    <div class="panel-item on">All Companies <span class="ct">248</span></div>
+    <div class="panel-sep"></div>
+    <div class="panel-title">Top</div>
+    <div class="panel-item">Google <span class="ct">1,204</span></div>
+    <div class="panel-item">Meta <span class="ct">876</span></div>
+    <div class="panel-item">Amazon <span class="ct">731</span></div>
+    <div class="panel-item">Stripe <span class="ct">412</span></div>
+    <div class="panel-item">OpenAI <span class="ct">388</span></div>
+    <div class="panel-item">Apple <span class="ct">341</span></div>
+    <div class="panel-item">Netflix <span class="ct">298</span></div>
+    <div class="panel-item">Airbnb <span class="ct">267</span></div>
+    <div class="panel-item">Anthropic <span class="ct">203</span></div>
+    <div class="panel-item" style="color:#444;font-size:12px;">+ 238 more</div>
+  `,
+  investors: `
+    <div class="panel-title">Investors</div>
+    <div class="panel-item on">All Investors <span class="ct">90</span></div>
+    <div class="panel-sep"></div>
+    <div class="panel-title">Top</div>
+    <div class="panel-item">Y Combinator <span class="ct">2,341</span></div>
+    <div class="panel-item">Sequoia <span class="ct">493</span></div>
+    <div class="panel-item">a16z <span class="ct">388</span></div>
+    <div class="panel-item">Lightspeed <span class="ct">271</span></div>
+    <div class="panel-item">Benchmark <span class="ct">198</span></div>
+    <div class="panel-item">Accel <span class="ct">156</span></div>
+    <div class="panel-item">GV <span class="ct">143</span></div>
+    <div class="panel-item" style="color:#444;font-size:12px;">+ 83 more</div>
+  `,
+  trending: `
+    <div class="panel-title">Trending now</div>
+    <div class="panel-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+      <span>오퍼 사인 후 2주 만에 취소됨</span>
+      <span class="ct">companies/meta · ↑ 512</span>
+    </div>
+    <div class="panel-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+      <span>YC W25 인터뷰 없이 거절</span>
+      <span class="ct">investors/yc · ↑ 341</span>
+    </div>
+    <div class="panel-item" style="flex-direction:column;align-items:flex-start;gap:2px;">
+      <span>L5 HC에서 막힘</span>
+      <span class="ct">companies/google · ↑ 243</span>
+    </div>
+    <div class="panel-sep"></div>
+    <div class="panel-title">This week</div>
+    <div class="panel-item"><span>Offer Rescinded</span><span class="ct">+34</span></div>
+    <div class="panel-item"><span>Onsite Reject</span><span class="ct">+89</span></div>
+    <div class="panel-item"><span>Application</span><span class="ct">+121</span></div>
+  `,
+  search: `
+    <div class="panel-title">Search</div>
+    <div style="padding:8px 16px;">
+      <div style="background:#141415;border:1px solid #2a2a2c;border-radius:5px;padding:7px 10px;font-size:13px;color:#444;display:flex;gap:8px;align-items:center;">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#444" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        Search…
+      </div>
+    </div>
+    <div class="panel-sep"></div>
+    <div class="panel-title">Recent searches</div>
+    <div class="panel-item">google onsite <span class="ct">✕</span></div>
+    <div class="panel-item">yc w25 <span class="ct">✕</span></div>
+    <div class="panel-item">offer rescinded <span class="ct">✕</span></div>
+  `,
+  profile: `
+    <div class="panel-title">Account</div>
+    <div class="panel-item on">Log In</div>
+    <div class="panel-item">Sign Up</div>
+    <div class="panel-sep"></div>
+    <div class="panel-title">Settings</div>
+    <div class="panel-item">Preferences</div>
+    <div class="panel-item">Help</div>
+    <div class="panel-item">About</div>
+  `,
+  post: `
+    <div class="panel-title">New Post</div>
+    <div style="padding:8px 16px;font-size:13px;color:#555;line-height:1.6;">
+      Share your rejection story anonymously. All posts are anonymous by default.
+    </div>
+    <div class="panel-item" style="justify-content:center;margin:8px 16px 0;background:#D7DADC;color:#0D0D0D;border-radius:4px;padding:8px;">Start writing →</div>
+  `
+};
+
+let currentPanel = null;
+
+function openPanel(name) {
+  const panel = document.getElementById('fPanel');
+  const inner = document.getElementById('fPanelInner');
+  document.querySelectorAll('#pF .icon-btn').forEach(b => b.classList.remove('on'));
+
+  if (currentPanel === name) {
+    closePanel(); return;
+  }
+  currentPanel = name;
+  inner.innerHTML = panels[name] || '';
+  panel.classList.add('open');
+  event.currentTarget.classList.add('on');
+}
+
+function closePanel() {
+  const panel = document.getElementById('fPanel');
+  panel.classList.remove('open');
+  document.querySelectorAll('#pF .icon-btn').forEach(b => b.classList.remove('on'));
+  currentPanel = null;
+  document.getElementById('fContext').style.display = 'none';
+}
+</script>
+</body>
+</html>

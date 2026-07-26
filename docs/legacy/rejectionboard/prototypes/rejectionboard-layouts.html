@@ -1,0 +1,1045 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RejectionBoard — Layout Options</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0D0D0D; color: #D7DADC; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 14px; }
+a { text-decoration: none; color: inherit; }
+
+/* ── Tab switcher ────────────────────────── */
+.switcher {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 9999;
+  background: #050505;
+  border-bottom: 1px solid #333;
+  display: flex; align-items: center; gap: 0; padding: 0 20px; height: 40px;
+}
+.sw-label { font-size: 11px; color: #555; margin-right: 16px; letter-spacing: 0.5px; text-transform: uppercase; }
+.sw-btn {
+  padding: 0 18px; height: 40px; font-size: 12px; color: #555;
+  background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; font-family: inherit; transition: color .15s;
+  margin-bottom: -1px;
+}
+.sw-btn:hover { color: #D7DADC; }
+.sw-btn.on { color: #D7DADC; border-bottom-color: #D7DADC; }
+.sw-note { margin-left: auto; font-size: 11px; color: #333; }
+
+/* ── Page wrapper ────────────────────────── */
+.page { display: none; padding-top: 40px; min-height: 100vh; }
+.page.on { display: block; }
+
+/* ── Shared pieces ───────────────────────── */
+.divider { border: none; border-top: 1px solid #1e1f20; }
+.tag {
+  display: inline-block; font-size: 11px; padding: 2px 7px;
+  border: 1px solid #2e2e30; border-radius: 10px; color: #818384;
+}
+.meta { font-size: 12px; color: #555; }
+
+
+/* ════════════════════════════════════════════
+   A  Reddit 3-column  +  Blind-style cards
+   ════════════════════════════════════════════ */
+#pA .navbar {
+  display: flex; align-items: center; gap: 0;
+  padding: 0 16px; height: 48px;
+  border-bottom: 1px solid #1e1f20; position: sticky; top: 40px; z-index: 10;
+  background: #0D0D0D;
+}
+#pA .navbar .logo { font-size: 16px; font-weight: 700; margin-right: 24px; }
+#pA .navbar .search {
+  flex: 1; max-width: 400px; height: 32px;
+  background: #1a1a1b; border: 1px solid #343536; border-radius: 4px;
+  display: flex; align-items: center; padding: 0 12px; gap: 8px;
+}
+#pA .navbar .search span { font-size: 13px; color: #555; }
+#pA .navbar .right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+#pA .navbar .right .btn {
+  padding: 5px 16px; border-radius: 20px; border: 1px solid #343536;
+  font-size: 13px; cursor: pointer; font-family: inherit; background: none; color: #D7DADC;
+}
+#pA .navbar .right .btn.primary { background: #fff; color: #0D0D0D; border-color: #fff; }
+#pA .navbar .right .avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: #272729; display: flex; align-items: center; justify-content: center;
+  font-size: 12px; color: #818384; cursor: pointer;
+}
+
+#pA .body { display: flex; max-width: 1200px; margin: 0 auto; padding: 0; }
+
+/* Left sidebar */
+#pA .left-sidebar {
+  width: 240px; min-width: 240px; min-height: calc(100vh - 88px);
+  border-right: 1px solid #1e1f20; padding: 16px 0;
+  position: sticky; top: 88px; align-self: flex-start; max-height: calc(100vh - 88px); overflow-y: auto;
+}
+#pA .ls-section { padding: 0 0 12px; margin-bottom: 4px; border-bottom: 1px solid #1e1f20; }
+#pA .ls-section:last-child { border-bottom: none; }
+#pA .ls-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 16px 4px; }
+#pA .ls-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 16px; font-size: 13px; color: #818384; cursor: pointer;
+  border-left: 2px solid transparent;
+}
+#pA .ls-item:hover { color: #D7DADC; background: #0f0f0f; }
+#pA .ls-item.active { color: #D7DADC; border-left-color: #D7DADC; }
+#pA .ls-dot { width: 20px; height: 20px; border-radius: 50%; background: #1e1f20; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+
+/* Center feed */
+#pA .feed { flex: 1; padding: 16px 16px; min-width: 0; max-width: 700px; }
+#pA .feed-filters { display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap; }
+#pA .filter-pill {
+  padding: 5px 14px; border-radius: 20px; border: 1px solid #343536;
+  font-size: 13px; color: #818384; background: none; cursor: pointer; font-family: inherit;
+}
+#pA .filter-pill.on { color: #D7DADC; border-color: #818384; }
+
+/* Blind-style post card */
+#pA .post {
+  padding: 14px 0;
+  border-bottom: 1px solid #1e1f20;
+  display: grid; grid-template-columns: 1fr 56px; gap: 12px;
+}
+#pA .p-company { font-size: 12px; color: #555; margin-bottom: 5px; display: flex; gap: 6px; align-items: center; }
+#pA .p-company .dot { width: 6px; height: 6px; border-radius: 50%; background: #343536; }
+#pA .p-title { font-size: 15px; color: #D7DADC; line-height: 1.35; margin-bottom: 6px; font-weight: 400; }
+#pA .p-body { font-size: 13px; color: #484849; line-height: 1.55; margin-bottom: 8px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+#pA .p-meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+#pA .p-right { text-align: right; padding-top: 2px; }
+#pA .p-score { font-size: 14px; font-weight: 500; color: #D7DADC; display: block; }
+#pA .p-comments { font-size: 12px; color: #555; display: block; margin-top: 4px; }
+
+/* Right sidebar */
+#pA .right-sidebar { width: 312px; min-width: 312px; padding: 16px; border-left: 1px solid #1e1f20; }
+#pA .rs-section { padding-bottom: 16px; border-bottom: 1px solid #1e1f20; margin-bottom: 16px; }
+#pA .rs-section:last-child { border: none; padding-bottom: 0; margin-bottom: 0; }
+#pA .rs-title { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+#pA .rs-item { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #1e1f20; }
+#pA .rs-item:last-child { border: none; }
+#pA .rs-rank { font-size: 13px; color: #555; width: 16px; }
+#pA .rs-dot { width: 20px; height: 20px; border-radius: 50%; background: #1e1f20; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #555; }
+#pA .rs-name { font-size: 13px; color: #818384; }
+#pA .create-btn {
+  display: block; width: 100%; text-align: center; padding: 7px;
+  background: #fff; border-radius: 20px; color: #0D0D0D; font-size: 13px;
+  cursor: pointer; margin-top: 8px;
+}
+#pA .rs-stat { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; color: #818384; border-bottom: 1px solid #1e1f20; }
+#pA .rs-stat:last-child { border: none; }
+
+
+/* ════════════════════════════════════════════
+   B  HN 1-column  (no sidebars, full width)
+   ════════════════════════════════════════════ */
+#pB .navbar {
+  display: flex; align-items: center; gap: 0;
+  padding: 0 20px; height: 44px;
+  border-bottom: 1px solid #1e1f20; position: sticky; top: 40px; z-index: 10;
+  background: #0D0D0D;
+}
+#pB .navbar .logo { font-size: 14px; font-weight: 700; padding-right: 16px; margin-right: 16px; border-right: 1px solid #1e1f20; }
+#pB .navbar a { font-size: 13px; color: #818384; margin-right: 16px; }
+#pB .navbar a:hover { color: #D7DADC; }
+#pB .navbar .right { margin-left: auto; font-size: 13px; color: #818384; }
+
+#pB .body { max-width: 880px; margin: 0 auto; padding: 12px 20px; }
+
+#pB .feed-header { display: flex; gap: 20px; margin-bottom: 4px; padding-bottom: 8px; border-bottom: 1px solid #1e1f20; }
+#pB .feed-header a { font-size: 13px; color: #818384; }
+#pB .feed-header a.on { color: #D7DADC; }
+
+#pB .post { display: grid; grid-template-columns: 32px 1fr; padding: 7px 0; border-bottom: 1px solid #161717; align-items: start; }
+#pB .p-num { font-size: 13px; color: #444; padding-top: 1px; }
+#pB .p-main {}
+#pB .p-title { font-size: 14px; color: #D7DADC; line-height: 1.3; }
+#pB .p-title .src { font-size: 11px; color: #444; margin-left: 6px; }
+#pB .p-sub { font-size: 12px; color: #444; margin-top: 2px; display: flex; gap: 6px; flex-wrap: wrap; }
+#pB .p-sub .sep { color: #2a2a2a; }
+#pB .p-sub a { color: #444; }
+#pB .p-sub a:hover { color: #818384; }
+#pB .p-sub .stage { color: #555; }
+
+#pB .pager { padding: 16px 32px; border-top: 1px solid #1e1f20; font-size: 13px; color: #555; }
+#pB .pager a { color: #818384; }
+
+
+/* ════════════════════════════════════════════
+   C  Discourse — left category panel + table
+   ════════════════════════════════════════════ */
+#pC .navbar {
+  display: flex; align-items: center; gap: 0;
+  padding: 0 20px; height: 48px;
+  border-bottom: 1px solid #1e1f20; position: sticky; top: 40px; z-index: 10;
+  background: #0D0D0D;
+}
+#pC .navbar .logo { font-size: 16px; font-weight: 700; margin-right: 4px; }
+#pC .navbar .nav-tabs { display: flex; gap: 2px; margin-left: 20px; }
+#pC .navbar .nav-tabs button {
+  padding: 6px 14px; border-radius: 6px; border: none;
+  font-size: 13px; color: #818384; background: none; cursor: pointer; font-family: inherit;
+}
+#pC .navbar .nav-tabs button.on { background: #1e1f20; color: #D7DADC; }
+#pC .navbar .right { margin-left: auto; display: flex; gap: 12px; align-items: center; font-size: 13px; color: #818384; }
+
+#pC .body { display: flex; }
+
+/* Left category panel */
+#pC .left-panel {
+  width: 220px; min-width: 220px; border-right: 1px solid #1e1f20;
+  padding: 16px 0; position: sticky; top: 88px; align-self: flex-start;
+  max-height: calc(100vh - 88px); overflow-y: auto;
+}
+#pC .lp-section { margin-bottom: 16px; }
+#pC .lp-label { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; padding: 0 16px 6px; }
+#pC .lp-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 7px 16px; font-size: 13px; color: #818384; cursor: pointer;
+}
+#pC .lp-item:hover { color: #D7DADC; background: #0f0f0f; }
+#pC .lp-item.on { color: #D7DADC; background: #111; }
+#pC .lp-count { font-size: 11px; color: #444; }
+
+/* Center table */
+#pC .table-wrap { flex: 1; min-width: 0; }
+#pC .table-topbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 12px 20px; border-bottom: 1px solid #1e1f20; flex-wrap: wrap;
+}
+#pC .table-topbar .tf {
+  padding: 4px 12px; border-radius: 4px; border: 1px solid #2e2e30;
+  font-size: 12px; color: #818384; background: none; cursor: pointer; font-family: inherit;
+}
+#pC .table-topbar .tf.on { color: #D7DADC; border-color: #555; }
+#pC .table-topbar .new-post {
+  margin-left: auto; padding: 5px 14px; border-radius: 4px;
+  background: #fff; color: #0D0D0D; font-size: 13px; cursor: pointer; border: none; font-family: inherit;
+}
+#pC .table-header {
+  display: grid; grid-template-columns: 1fr 140px 56px 56px;
+  padding: 8px 20px; gap: 12px;
+  font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px;
+  border-bottom: 1px solid #1e1f20;
+}
+#pC .table-row {
+  display: grid; grid-template-columns: 1fr 140px 56px 56px;
+  padding: 13px 20px; gap: 12px; align-items: center;
+  border-bottom: 1px solid #161717; cursor: pointer; transition: background .1s;
+}
+#pC .table-row:hover { background: #0f0f0f; }
+#pC .tr-title { font-size: 14px; color: #D7DADC; line-height: 1.3; }
+#pC .tr-company { font-size: 12px; color: #444; margin-top: 2px; }
+#pC .tr-stage { font-size: 12px; color: #818384; }
+#pC .tr-num { font-size: 13px; color: #555; text-align: right; }
+#pC .tr-num.hot { color: #D7DADC; }
+#pC .new-chip { font-size: 10px; font-weight: 600; background: #1e1f20; color: #D7DADC; padding: 1px 5px; border-radius: 3px; margin-left: 6px; vertical-align: middle; }
+
+/* Right sidebar (Discourse-style, minimal) */
+#pC .right-panel { width: 260px; min-width: 260px; border-left: 1px solid #1e1f20; padding: 16px; }
+#pC .rp-section { margin-bottom: 20px; }
+#pC .rp-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+#pC .rp-stat { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid #1e1f20; font-size: 13px; }
+#pC .rp-stat:last-child { border: none; }
+#pC .rp-stat .label { color: #555; }
+#pC .rp-stat .val { color: #D7DADC; font-weight: 500; }
+#pC .rp-tag { display: inline-block; padding: 3px 10px; border-radius: 12px; border: 1px solid #2e2e30; font-size: 12px; color: #818384; margin: 3px 3px 3px 0; cursor: pointer; }
+#pC .rp-tag:hover { color: #D7DADC; border-color: #555; }
+#pC .rp-tag.on { color: #D7DADC; border-color: #818384; }
+
+
+/* ════════════════════════════════════════════
+   D  2-column  +  company-grouped feed
+   ════════════════════════════════════════════ */
+#pD .navbar {
+  display: flex; align-items: center;
+  padding: 0 20px; height: 48px;
+  border-bottom: 1px solid #1e1f20; position: sticky; top: 40px; z-index: 10;
+  background: #0D0D0D;
+}
+#pD .navbar .logo { font-size: 16px; font-weight: 700; margin-right: 28px; }
+#pD .navbar a { font-size: 13px; color: #818384; margin-right: 20px; }
+#pD .navbar a.on { color: #D7DADC; }
+#pD .navbar .right { margin-left: auto; display: flex; gap: 12px; align-items: center; }
+#pD .navbar .right .btn { padding: 5px 16px; border-radius: 20px; border: 1px solid #343536; font-size: 13px; color: #818384; background: none; cursor: pointer; font-family: inherit; }
+#pD .navbar .right .btn.p { background: #fff; color: #0D0D0D; border-color: #fff; }
+
+#pD .body { display: flex; max-width: 1100px; margin: 0 auto; }
+
+/* Main content */
+#pD .main { flex: 1; min-width: 0; padding: 20px 20px; }
+
+/* Company section */
+#pD .co-section { margin-bottom: 28px; }
+#pD .co-head {
+  display: flex; align-items: center; gap: 12px;
+  padding-bottom: 10px; border-bottom: 1px solid #1e1f20;
+}
+#pD .co-avatar { width: 28px; height: 28px; border-radius: 50%; background: #1a1a1b; border: 1px solid #2e2e30; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: #555; flex-shrink: 0; }
+#pD .co-name { font-size: 15px; font-weight: 500; color: #D7DADC; }
+#pD .co-sub { font-size: 12px; color: #444; margin-left: 6px; }
+#pD .co-link { margin-left: auto; font-size: 12px; color: #444; }
+#pD .co-link:hover { color: #818384; }
+
+#pD .post-row {
+  display: grid; grid-template-columns: 1fr auto;
+  padding: 11px 0 11px 40px; border-bottom: 1px solid #161717;
+  gap: 16px; align-items: start; cursor: pointer;
+}
+#pD .post-row:hover .pr-title { color: #fff; }
+#pD .pr-title { font-size: 14px; color: #D7DADC; line-height: 1.3; margin-bottom: 3px; }
+#pD .pr-body { font-size: 12px; color: #3a3a3a; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 5px; }
+#pD .pr-meta { display: flex; gap: 8px; align-items: center; }
+#pD .pr-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; padding-top: 1px; }
+#pD .pr-score { font-size: 13px; color: #818384; white-space: nowrap; }
+#pD .pr-cmt { font-size: 12px; color: #444; white-space: nowrap; }
+
+/* Right sidebar */
+#pD .right-sidebar { width: 280px; min-width: 280px; border-left: 1px solid #1e1f20; padding: 20px 16px; }
+#pD .rs-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #1e1f20; }
+#pD .rs-section:last-child { border: none; padding-bottom: 0; margin-bottom: 0; }
+#pD .rs-title { font-size: 11px; color: #444; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+#pD .rs-post { padding: 8px 0; border-bottom: 1px solid #161717; }
+#pD .rs-post:last-child { border: none; }
+#pD .rs-post .t { font-size: 13px; color: #818384; line-height: 1.35; margin-bottom: 3px; }
+#pD .rs-post .m { font-size: 11px; color: #444; }
+#pD .rs-item { display: flex; gap: 8px; align-items: center; padding: 5px 0; border-bottom: 1px solid #161717; }
+#pD .rs-item:last-child { border: none; }
+#pD .rs-item .av { width: 20px; height: 20px; border-radius: 50%; background: #1a1a1b; border: 1px solid #2e2e30; display: flex; align-items: center; justify-content: center; font-size: 9px; color: #444; }
+#pD .rs-item .nm { font-size: 13px; color: #818384; }
+#pD .rs-item .ct { font-size: 11px; color: #444; margin-left: auto; }
+</style>
+</head>
+<body>
+
+<!-- Tab switcher -->
+<div class="switcher">
+  <span class="sw-label">Layout</span>
+  <button class="sw-btn on" onclick="show('pA',this)">A — 3열 Blind형</button>
+  <button class="sw-btn" onclick="show('pB',this)">B — 1열 HN형</button>
+  <button class="sw-btn" onclick="show('pC',this)">C — Discourse 테이블</button>
+  <button class="sw-btn" onclick="show('pD',this)">D — 회사별 그룹</button>
+  <span class="sw-note">클릭하면 전환</span>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE A  — 3컬럼 (좌 nav + 중 피드 + 우 사이드바)
+     현재 구조 유지 + 카드 스타일 Blind로 교체
+     핵심 변경: 투표 우측 숫자 / 회사명 메타라인 / 본문 2줄
+     ══════════════════════════════════════════════════════════════ -->
+<div id="pA" class="page on">
+
+  <nav class="navbar" id="pA">
+    <span class="logo">Faildit</span>
+    <div class="search">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#555" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <span>Search Faildit</span>
+    </div>
+    <div class="right">
+      <button class="btn">Log In</button>
+      <button class="btn primary">Sign Up</button>
+      <div class="avatar">U</div>
+    </div>
+  </nav>
+
+  <div class="body" id="pA">
+    <!-- Left sidebar -->
+    <aside class="left-sidebar" id="pA">
+      <div class="ls-section">
+        <div class="ls-item active"><span class="ls-dot">⌂</span> Home</div>
+        <div class="ls-item"><span class="ls-dot">↑</span> Popular</div>
+        <div class="ls-item"><span class="ls-dot">✦</span> All</div>
+      </div>
+      <div class="ls-section">
+        <div class="ls-label">Jobs</div>
+        <div class="ls-item"><span class="ls-dot">G</span> Google</div>
+        <div class="ls-item"><span class="ls-dot">M</span> Meta</div>
+        <div class="ls-item"><span class="ls-dot">A</span> Amazon</div>
+        <div class="ls-item"><span class="ls-dot">A</span> Apple</div>
+        <div class="ls-item"><span class="ls-dot">S</span> Stripe</div>
+        <div class="ls-item"><span class="ls-dot">N</span> Netflix</div>
+        <div class="ls-item"><span class="ls-dot">O</span> OpenAI</div>
+        <div class="ls-item" style="color:#444;font-size:12px;padding-left:16px;">+ 240 more</div>
+      </div>
+      <div class="ls-section">
+        <div class="ls-label">Investors</div>
+        <div class="ls-item"><span class="ls-dot">Y</span> YC</div>
+        <div class="ls-item"><span class="ls-dot">S</span> Sequoia</div>
+        <div class="ls-item"><span class="ls-dot">A</span> a16z</div>
+        <div class="ls-item"><span class="ls-dot">L</span> Lightspeed</div>
+        <div class="ls-item" style="color:#444;font-size:12px;padding-left:16px;">+ 90 more</div>
+      </div>
+      <div class="ls-section">
+        <div class="ls-label">You</div>
+        <div class="ls-item"><span class="ls-dot">↑</span> My Posts</div>
+        <div class="ls-item"><span class="ls-dot">⊕</span> Post a rejection</div>
+      </div>
+    </aside>
+
+    <!-- Center feed -->
+    <main class="feed" id="pA">
+      <div class="feed-filters">
+        <button class="filter-pill on">All</button>
+        <button class="filter-pill">Jobs</button>
+        <button class="filter-pill">Investors</button>
+        <div style="margin-left:auto;display:flex;gap:6px;">
+          <button class="filter-pill on">New</button>
+          <button class="filter-pill">Top</button>
+        </div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> companies/meta · SWE · Offer Rescinded</div>
+          <div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div>
+          <div class="p-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비 다 해놨었는데...</div>
+          <div class="p-meta"><span class="tag">Offer Rescinded</span><span class="meta">익명 · 2d ago · 88 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 512</span><span class="p-comments">88 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> companies/google · SWE · Onsite</div>
+          <div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div>
+          <div class="p-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락이 왔고...</div>
+          <div class="p-meta"><span class="tag">Ghosted after HC</span><span class="meta">익명 · 3h ago · 42 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 243</span><span class="p-comments">42 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> investors/yc · Batch W25 · Application</div>
+          <div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div>
+          <div class="p-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 없음. 이전에 한 번 더 지원해서 인터뷰까지 갔었는데...</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 4d ago · 61 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 341</span><span class="p-comments">61 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> investors/sequoia · Series A · Partner Meeting</div>
+          <div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div>
+          <div class="p-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no. "시장 사이즈가 우리 기대보다 작다"는 말을...</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 7h ago · 28 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 189</span><span class="p-comments">28 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> companies/stripe · PM · Phone Screen</div>
+          <div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div>
+          <div class="p-body">리크루터가 "팀이 원하는 프로필과 맞지 않는다"고만 했는데. 폰스크린이 30분이었고 제품 경험 위주로 물어봤음...</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 1d ago · 15 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 97</span><span class="p-comments">15 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> investors/a16z · Pre-seed · Intro Call</div>
+          <div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div>
+          <div class="p-body">첫 콜 15분 만에 "지금 우리가 보는 팀 프로필이 아니다"라고. 덱도 제대로 안 봤을 것 같은 느낌...</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 3d ago · 33 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 76</span><span class="p-comments">33 💬</span></div>
+      </div>
+
+      <div class="post">
+        <div>
+          <div class="p-company"><span class="dot"></span> companies/amazon · SWE · Onsite</div>
+          <div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div>
+          <div class="p-body">5라운드 다 통과했다고 생각했는데 Debrief에서 "LP 기준 미달" 하나로 날아감. 어느 라운드인지도 안 알려줌...</div>
+          <div class="p-meta"><span class="tag">Rejected</span><span class="meta">익명 · 5d ago · 47 comments</span></div>
+        </div>
+        <div class="p-right"><span class="p-score">↑ 128</span><span class="p-comments">47 💬</span></div>
+      </div>
+    </main>
+
+    <!-- Right sidebar -->
+    <aside class="right-sidebar" id="pA">
+      <div class="rs-section">
+        <div class="rs-title">Recent</div>
+        <div class="rs-stat"><span class="label">오퍼 사인 후 2주 만에...</span></div>
+        <div class="rs-stat"><span class="label">L5 onsite 5라운드...</span></div>
+        <div class="rs-stat"><span class="label">YC W25 지원 결과...</span></div>
+      </div>
+      <div class="rs-section">
+        <div class="create-btn">+ Post a Rejection</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-title">Top Communities</div>
+        <div class="rs-item"><span class="rs-rank">1</span><span class="rs-dot">G</span><span class="rs-name">companies/google</span></div>
+        <div class="rs-item"><span class="rs-rank">2</span><span class="rs-dot">Y</span><span class="rs-name">investors/yc</span></div>
+        <div class="rs-item"><span class="rs-rank">3</span><span class="rs-dot">M</span><span class="rs-name">companies/meta</span></div>
+        <div class="rs-item"><span class="rs-rank">4</span><span class="rs-dot">S</span><span class="rs-name">investors/sequoia</span></div>
+        <div class="rs-item"><span class="rs-rank">5</span><span class="rs-dot">A</span><span class="rs-name">companies/amazon</span></div>
+        <div style="margin-top:8px;font-size:12px;color:#444;">View all →</div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-title">Stats</div>
+        <div class="rs-stat"><span class="label">Total posts</span><span class="val">14,821</span></div>
+        <div class="rs-stat"><span class="label">This week</span><span class="val">+342</span></div>
+        <div class="rs-stat"><span class="label">Communities</span><span class="val">338</span></div>
+      </div>
+      <div class="rs-section" style="font-size:12px;color:#444;line-height:2;">
+        Help · About · Privacy · Terms<br>Faildit © 2026
+      </div>
+    </aside>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE B  — 1컬럼 HN형 (사이드바 없음, 최대 밀도)
+     핵심 변경: 번호 리스트 / 본문 없음 / 상단 nav에 모든 기능
+     ══════════════════════════════════════════════════════════════ -->
+<div id="pB" class="page">
+
+  <nav class="navbar" id="pB">
+    <span class="logo">Faildit</span>
+    <a href="#" class="on">new</a>
+    <a href="#">top</a>
+    <a href="#">companies</a>
+    <a href="#">investors</a>
+    <a href="#">search</a>
+    <a href="#">submit</a>
+    <div class="right">
+      <a href="#">login</a>
+    </div>
+  </nav>
+
+  <div class="body" id="pB">
+
+    <div class="feed-header">
+      <a href="#" class="on">New</a>
+      <a href="#">Top</a>
+      <a href="#">Past</a>
+      <a href="#">Ask</a>
+      <a href="#">Show</a>
+      <a href="#">Jobs</a>
+      <a href="#">Submit</a>
+    </div>
+
+    <div class="post">
+      <div class="p-num">1.</div>
+      <div class="p-main">
+        <div class="p-title">오퍼 사인 후 2주 만에 레이오프로 취소됨 <span class="src">(companies/meta · SWE)</span></div>
+        <div class="p-sub">
+          <span>512 points</span><span class="sep">·</span>
+          <span class="stage">Offer Rescinded</span><span class="sep">·</span>
+          <span>2 days ago</span><span class="sep">·</span>
+          <a href="#">88 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">2.</div>
+      <div class="p-main">
+        <div class="p-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절 <span class="src">(investors/yc · Batch)</span></div>
+        <div class="p-sub">
+          <span>341 points</span><span class="sep">·</span>
+          <span class="stage">Application · Rejected</span><span class="sep">·</span>
+          <span>4 days ago</span><span class="sep">·</span>
+          <a href="#">61 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">3.</div>
+      <div class="p-main">
+        <div class="p-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤 <span class="src">(companies/google · SWE)</span></div>
+        <div class="p-sub">
+          <span>243 points</span><span class="sep">·</span>
+          <span class="stage">Onsite · Ghosted after HC</span><span class="sep">·</span>
+          <span>3 hours ago</span><span class="sep">·</span>
+          <a href="#">42 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">4.</div>
+      <div class="p-main">
+        <div class="p-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요" <span class="src">(investors/sequoia · Series A)</span></div>
+        <div class="p-sub">
+          <span>189 points</span><span class="sep">·</span>
+          <span class="stage">Partner Meeting · Rejected</span><span class="sep">·</span>
+          <span>7 hours ago</span><span class="sep">·</span>
+          <a href="#">28 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">5.</div>
+      <div class="p-main">
+        <div class="p-title">Amazon L6 바 레이저가 뭔지 이제 알겠음 <span class="src">(companies/amazon · SWE)</span></div>
+        <div class="p-sub">
+          <span>128 points</span><span class="sep">·</span>
+          <span class="stage">Onsite · Rejected</span><span class="sep">·</span>
+          <span>5 days ago</span><span class="sep">·</span>
+          <a href="#">47 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">6.</div>
+      <div class="p-main">
+        <div class="p-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분? <span class="src">(companies/stripe · PM)</span></div>
+        <div class="p-sub">
+          <span>97 points</span><span class="sep">·</span>
+          <span class="stage">Phone Screen · Rejected</span><span class="sep">·</span>
+          <span>1 day ago</span><span class="sep">·</span>
+          <a href="#">15 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">7.</div>
+      <div class="p-main">
+        <div class="p-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요" <span class="src">(investors/a16z · Pre-seed)</span></div>
+        <div class="p-sub">
+          <span>76 points</span><span class="sep">·</span>
+          <span class="stage">Intro Call · Rejected</span><span class="sep">·</span>
+          <span>3 days ago</span><span class="sep">·</span>
+          <a href="#">33 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">8.</div>
+      <div class="p-main">
+        <div class="p-title">Airbnb 디자인 온사이트 — 포트폴리오 프리젠이 발목 잡음 <span class="src">(companies/airbnb · Designer)</span></div>
+        <div class="p-sub">
+          <span>64 points</span><span class="sep">·</span>
+          <span class="stage">Onsite · Rejected</span><span class="sep">·</span>
+          <span>6 days ago</span><span class="sep">·</span>
+          <a href="#">19 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">9.</div>
+      <div class="p-main">
+        <div class="p-title">YC 인터뷰 10분 — "시장이 너무 작아요" 끝 <span class="src">(investors/yc · Batch)</span></div>
+        <div class="p-sub">
+          <span>156 points</span><span class="sep">·</span>
+          <span class="stage">Interview · Rejected</span><span class="sep">·</span>
+          <span>1 week ago</span><span class="sep">·</span>
+          <a href="#">44 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="post">
+      <div class="p-num">10.</div>
+      <div class="p-main">
+        <div class="p-title">E5 온사이트 all strong hire인데 최종 no — 무슨 기준인지 모르겠음 <span class="src">(companies/meta · SWE)</span></div>
+        <div class="p-sub">
+          <span>209 points</span><span class="sep">·</span>
+          <span class="stage">Onsite · Rejected</span><span class="sep">·</span>
+          <span>5 days ago</span><span class="sep">·</span>
+          <a href="#">54 comments</a><span class="sep">·</span>
+          <a href="#">hide</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pager">
+      <a href="#">More (40 left) →</a>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE C  — Discourse: 좌 카테고리 + 중 테이블 + 우 패널
+     핵심 변경: 테이블 형태, 스테이지/점수/댓글 컬럼, 좌 필터
+     ══════════════════════════════════════════════════════════════ -->
+<div id="pC" class="page">
+
+  <nav class="navbar" id="pC">
+    <span class="logo">Faildit</span>
+    <div class="nav-tabs">
+      <button class="on">Latest</button>
+      <button>Top</button>
+      <button>New</button>
+      <button>Unseen</button>
+    </div>
+    <div class="right">
+      <span style="cursor:pointer;">🔍</span>
+      <span style="cursor:pointer;">🔔</span>
+      <span style="cursor:pointer;">Login</span>
+    </div>
+  </nav>
+
+  <div class="body" id="pC">
+
+    <!-- Left category panel -->
+    <aside class="left-panel" id="pC">
+      <div class="lp-section">
+        <div class="lp-label">Filter</div>
+        <div class="lp-item on">All <span class="lp-count">14,821</span></div>
+        <div class="lp-item">Jobs <span class="lp-count">9,304</span></div>
+        <div class="lp-item">Investors <span class="lp-count">5,517</span></div>
+      </div>
+      <div class="lp-section">
+        <div class="lp-label">Stage</div>
+        <div class="lp-item">Phone Screen <span class="lp-count">2,110</span></div>
+        <div class="lp-item">Onsite <span class="lp-count">4,883</span></div>
+        <div class="lp-item">Offer <span class="lp-count">891</span></div>
+        <div class="lp-item">Ghosted <span class="lp-count">3,021</span></div>
+        <div class="lp-item">Application <span class="lp-count">3,916</span></div>
+      </div>
+      <div class="lp-section">
+        <div class="lp-label">Top Companies</div>
+        <div class="lp-item">Google <span class="lp-count">1,204</span></div>
+        <div class="lp-item">Meta <span class="lp-count">876</span></div>
+        <div class="lp-item">Amazon <span class="lp-count">731</span></div>
+        <div class="lp-item">Stripe <span class="lp-count">412</span></div>
+        <div class="lp-item">OpenAI <span class="lp-count">388</span></div>
+        <div class="lp-item" style="color:#333;font-size:12px;padding-left:16px;">+ 233 more</div>
+      </div>
+      <div class="lp-section">
+        <div class="lp-label">Top Investors</div>
+        <div class="lp-item">YC <span class="lp-count">2,341</span></div>
+        <div class="lp-item">Sequoia <span class="lp-count">493</span></div>
+        <div class="lp-item">a16z <span class="lp-count">388</span></div>
+        <div class="lp-item" style="color:#333;font-size:12px;padding-left:16px;">+ 87 more</div>
+      </div>
+    </aside>
+
+    <!-- Center table -->
+    <div class="table-wrap" id="pC">
+      <div class="table-topbar">
+        <button class="tf on">New</button>
+        <button class="tf">Top</button>
+        <button class="tf">Hot</button>
+        <button class="new-post">+ Post</button>
+      </div>
+      <div class="table-header">
+        <span>Post</span>
+        <span>Stage</span>
+        <span style="text-align:right;">Score</span>
+        <span style="text-align:right;">💬</span>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">오퍼 사인 후 2주 만에 레이오프로 취소됨 <span class="new-chip">HOT</span></div>
+          <div class="tr-company">companies/meta · SWE · 2d ago</div>
+        </div>
+        <div class="tr-stage">Offer Rescinded</div>
+        <div class="tr-num hot">512</div>
+        <div class="tr-num hot">88</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div>
+          <div class="tr-company">investors/yc · Batch · 4d ago</div>
+        </div>
+        <div class="tr-stage">Application</div>
+        <div class="tr-num">341</div>
+        <div class="tr-num">61</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div>
+          <div class="tr-company">companies/google · SWE · 3h ago</div>
+        </div>
+        <div class="tr-stage">Onsite</div>
+        <div class="tr-num">243</div>
+        <div class="tr-num">42</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">E5 온사이트 all strong hire인데 최종 no <span class="new-chip">NEW</span></div>
+          <div class="tr-company">companies/meta · SWE · 5d ago</div>
+        </div>
+        <div class="tr-stage">Onsite</div>
+        <div class="tr-num">209</div>
+        <div class="tr-num">54</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div>
+          <div class="tr-company">investors/sequoia · Series A · 7h ago</div>
+        </div>
+        <div class="tr-stage">Partner Meeting</div>
+        <div class="tr-num">189</div>
+        <div class="tr-num">28</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">YC 인터뷰 10분 — "시장이 너무 작아요" 끝</div>
+          <div class="tr-company">investors/yc · Batch · 1w ago</div>
+        </div>
+        <div class="tr-stage">Interview</div>
+        <div class="tr-num">156</div>
+        <div class="tr-num">44</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">Amazon L6 바 레이저가 뭔지 이제 알겠음</div>
+          <div class="tr-company">companies/amazon · SWE · 5d ago</div>
+        </div>
+        <div class="tr-stage">Onsite</div>
+        <div class="tr-num">128</div>
+        <div class="tr-num">47</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">PM 폰스크린 1번에 컷. 어떤 질문이 나왔는지 아는 분?</div>
+          <div class="tr-company">companies/stripe · PM · 1d ago</div>
+        </div>
+        <div class="tr-stage">Phone Screen</div>
+        <div class="tr-num">97</div>
+        <div class="tr-num">15</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">파운더 배경이 없다고 패스. "실행 트랙레코드가 부족해요"</div>
+          <div class="tr-company">investors/a16z · Pre-seed · 3d ago</div>
+        </div>
+        <div class="tr-stage">Intro Call</div>
+        <div class="tr-num">76</div>
+        <div class="tr-num">33</div>
+      </div>
+
+      <div class="table-row">
+        <div>
+          <div class="tr-title">Airbnb 디자인 온사이트 — 포트폴리오 프리젠이 발목 잡음</div>
+          <div class="tr-company">companies/airbnb · Designer · 6d ago</div>
+        </div>
+        <div class="tr-stage">Onsite</div>
+        <div class="tr-num">64</div>
+        <div class="tr-num">19</div>
+      </div>
+
+    </div>
+
+    <!-- Right stats panel -->
+    <aside class="right-panel" id="pC">
+      <div class="rp-section">
+        <div class="rp-title">Overview</div>
+        <div class="rp-stat"><span class="label">Total stories</span><span class="val">14,821</span></div>
+        <div class="rp-stat"><span class="label">This week</span><span class="val">+342</span></div>
+        <div class="rp-stat"><span class="label">Companies</span><span class="val">248</span></div>
+        <div class="rp-stat"><span class="label">Investors</span><span class="val">90</span></div>
+      </div>
+      <div class="rp-section">
+        <div class="rp-title">Filter by Stage</div>
+        <span class="rp-tag on">All</span>
+        <span class="rp-tag">Phone Screen</span>
+        <span class="rp-tag">Onsite</span>
+        <span class="rp-tag">Offer</span>
+        <span class="rp-tag">Ghosted</span>
+        <span class="rp-tag">Application</span>
+      </div>
+      <div class="rp-section">
+        <div class="rp-title">Trending Tags</div>
+        <span class="rp-tag">Offer Rescinded</span>
+        <span class="rp-tag">HC Reject</span>
+        <span class="rp-tag">No Feedback</span>
+        <span class="rp-tag">3 months</span>
+        <span class="rp-tag">L5/L6</span>
+      </div>
+      <div class="rp-section" style="font-size:12px;color:#333;line-height:2;">
+        Help · About · Rules · Privacy<br>Faildit © 2026
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════════════════════════
+     PAGE D  — 2컬럼 (좌 사이드바 없음) + 회사별 그룹 피드
+     핵심 변경: 회사별 섹션 헤더 / 우 사이드바만 유지
+     ══════════════════════════════════════════════════════════════ -->
+<div id="pD" class="page">
+
+  <nav class="navbar" id="pD">
+    <span class="logo">Faildit</span>
+    <a href="#" class="on">Home</a>
+    <a href="#">Companies</a>
+    <a href="#">Investors</a>
+    <a href="#">All Posts</a>
+    <div class="right">
+      <button class="btn">Login</button>
+      <button class="btn p">Post</button>
+    </div>
+  </nav>
+
+  <div class="body" id="pD">
+
+    <!-- Main feed (no left sidebar) -->
+    <main class="main" id="pD">
+
+      <!-- Google -->
+      <div class="co-section">
+        <div class="co-head">
+          <div class="co-avatar">G</div>
+          <span class="co-name">Google</span>
+          <span class="co-sub">1,204 posts</span>
+          <a href="#" class="co-link">View all →</a>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">L5 onsite 5라운드 통과했는데 HC에서 막힘. 피드백도 없고 재지원도 1년 뒤</div>
+            <div class="pr-body">마지막 라운드에서 시스템 디자인을 꽤 잘 풀었다고 생각했는데. 코딩도 전부 AC. 근데 hire가 아니라는 연락...</div>
+            <div class="pr-meta"><span class="tag">Onsite</span><span class="tag">Ghosted after HC</span><span class="meta">3h ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 243</span><span class="pr-cmt">42 💬</span></div>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">NOOGLER 취소 — 입사 1주 전에 오퍼 철회 연락</div>
+            <div class="pr-body">레이오프 여파인지. "현재 헤드카운트 조정 중"이라는 말만. 다른 회사 오퍼 다 날린 상태였는데...</div>
+            <div class="pr-meta"><span class="tag">Offer Rescinded</span><span class="meta">2d ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 178</span><span class="pr-cmt">31 💬</span></div>
+        </div>
+      </div>
+
+      <!-- Meta -->
+      <div class="co-section">
+        <div class="co-head">
+          <div class="co-avatar">M</div>
+          <span class="co-name">Meta</span>
+          <span class="co-sub">876 posts</span>
+          <a href="#" class="co-link">View all →</a>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">오퍼 사인 후 2주 만에 레이오프로 취소됨</div>
+            <div class="pr-body">입사일 3주 앞두고 연락이 왔음. "글로벌 헤드카운트 조정으로 포지션이 없어졌다"고. 입사일 맞춰서 이직 준비...</div>
+            <div class="pr-meta"><span class="tag" style="border-color:#555;color:#D7DADC;">HOT</span><span class="tag">Offer Rescinded</span><span class="meta">2d ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 512</span><span class="pr-cmt">88 💬</span></div>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">E5 온사이트 all strong hire인데 최종 no — 무슨 기준인지 모르겠음</div>
+            <div class="pr-body">5개 루프 중 4개 strong hire, 1개 hire. HC 통과 못 했다는 연락만 왔고 어느 라운드가 문제인지도 안 알려줌...</div>
+            <div class="pr-meta"><span class="tag">Onsite</span><span class="meta">5d ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 209</span><span class="pr-cmt">54 💬</span></div>
+        </div>
+      </div>
+
+      <!-- YC -->
+      <div class="co-section">
+        <div class="co-head">
+          <div class="co-avatar">Y</div>
+          <span class="co-name">Y Combinator</span>
+          <span class="co-sub">2,341 posts</span>
+          <a href="#" class="co-link">View all →</a>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div>
+            <div class="pr-body">지원서 제출 후 2주 만에 "At this time we will not be moving forward". 뭐가 문제였는지 피드백이 없음...</div>
+            <div class="pr-meta"><span class="tag">Application</span><span class="meta">4d ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 341</span><span class="pr-cmt">61 💬</span></div>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">YC 인터뷰 10분 — "시장이 너무 작아요" 끝</div>
+            <div class="pr-body">파트너 2명이 교대로 질문. 트랙션 얘기 꺼내기도 전에 마켓사이즈로 막혔음. B2B SaaS는 YC와 안 맞는건지...</div>
+            <div class="pr-meta"><span class="tag">Interview</span><span class="meta">1w ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 156</span><span class="pr-cmt">44 💬</span></div>
+        </div>
+      </div>
+
+      <!-- Sequoia -->
+      <div class="co-section">
+        <div class="co-head">
+          <div class="co-avatar">S</div>
+          <span class="co-name">Sequoia</span>
+          <span class="co-sub">493 posts</span>
+          <a href="#" class="co-link">View all →</a>
+        </div>
+        <div class="post-row">
+          <div>
+            <div class="pr-title">3개월 프로세스 끝에 "지금 우리 thesis와 맞지 않아요"</div>
+            <div class="pr-body">LP 미팅까지 갔었는데. 파트너 미팅 3번, DD 2달, 텀싯 초안까지 받았는데 결국 no. "시장 사이즈가..."</div>
+            <div class="pr-meta"><span class="tag">Partner Meeting</span><span class="meta">7h ago</span></div>
+          </div>
+          <div class="pr-right"><span class="pr-score">↑ 189</span><span class="pr-cmt">28 💬</span></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Right sidebar -->
+    <aside class="right-sidebar" id="pD">
+      <div class="rs-section">
+        <div class="rs-title">Browse by</div>
+        <div class="rs-item"><span style="font-size:13px;color:#818384;">Companies</span><span class="ct">248 →</span></div>
+        <div class="rs-item"><span style="font-size:13px;color:#818384;">Investors</span><span class="ct">90 →</span></div>
+        <div class="rs-item"><span style="font-size:13px;color:#818384;">All posts</span><span class="ct">14.8k →</span></div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-title">Trending this week</div>
+        <div class="rs-post"><div class="t">오퍼 사인 후 2주 만에 레이오프로 취소됨</div><div class="m">companies/meta · ↑ 512</div></div>
+        <div class="rs-post"><div class="t">YC W25 지원 결과 — 인터뷰 없이 바로 거절</div><div class="m">investors/yc · ↑ 341</div></div>
+        <div class="rs-post"><div class="t">L5 onsite 5라운드 통과했는데 HC에서 막힘</div><div class="m">companies/google · ↑ 243</div></div>
+      </div>
+      <div class="rs-section">
+        <div class="rs-title">Most active</div>
+        <div class="rs-item"><div class="av">G</div><span class="nm">companies/google</span><span class="ct">1,204</span></div>
+        <div class="rs-item"><div class="av">Y</div><span class="nm">investors/yc</span><span class="ct">2,341</span></div>
+        <div class="rs-item"><div class="av">M</div><span class="nm">companies/meta</span><span class="ct">876</span></div>
+        <div class="rs-item"><div class="av">S</div><span class="nm">investors/sequoia</span><span class="ct">493</span></div>
+      </div>
+      <div class="rs-section" style="font-size:12px;color:#333;line-height:2;">
+        Help · About · Privacy · Terms<br>Faildit © 2026
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+function show(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('on'));
+  document.querySelectorAll('.sw-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+  window.scrollTo(0, 0);
+}
+</script>
+</body>
+</html>

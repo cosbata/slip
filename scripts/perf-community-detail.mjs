@@ -1,0 +1,50 @@
+import { chromium } from 'playwright'
+
+const origin = process.env.PERF_ORIGIN || 'https://slip.wtf'
+const communityPath = '/c/companies/google/swe'
+const communityUrl = `${origin}${communityPath}`
+const pass = []
+const fail = []
+
+async function timedFetch(label, url, maxMs) {
+  const start = performance.now()
+  const res = await fetch(url, { redirect: 'follow' })
+  await res.arrayBuffer()
+  const total = performance.now() - start
+  const item = `${label}: ${Math.round(total)}ms status=${res.status}`
+  ;(res.ok && total <= maxMs ? pass : fail).push(item)
+  return total
+}
+
+await timedFetch('warm community document 1', communityUrl, 1500)
+await timedFetch('warm community document 2', communityUrl, 1500)
+
+const browser = await chromium.launch({ headless: true })
+const page = await browser.newPage({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true })
+await page.goto(origin, { waitUntil: 'domcontentloaded' })
+await page.waitForSelector('a[href^="/c/"]', { timeout: 15000 })
+await page.waitForLoadState('networkidle', { timeout: 15000 }).catch(() => {})
+await page.waitForTimeout(500)
+const firstCommunity = page.locator('a[href="/c/companies/google/swe"], a[href^="/c/"]').first()
+await firstCommunity.dispatchEvent('touchstart')
+await firstCommunity.dispatchEvent('pointerdown')
+await page.waitForTimeout(300)
+const clickStart = performance.now()
+await firstCommunity.click()
+await page.waitForURL(/\/c\//, { timeout: 10000 })
+await page.locator('.community-hero h1').first().waitFor({ timeout: 10000 })
+const clickMs = performance.now() - clickStart
+const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1)
+const finalUrl = page.url()
+await browser.close()
+
+const clickLine = `mobile intent click to community title: ${Math.round(clickMs)}ms url=${finalUrl}`
+;(clickMs <= 2000 && !overflow ? pass : fail).push(clickLine + ` overflow=${overflow}`)
+
+console.log('PASS evidence:')
+for (const line of pass) console.log(`- ${line}`)
+if (fail.length) {
+  console.error('FAIL evidence:')
+  for (const line of fail) console.error(`- ${line}`)
+  process.exit(1)
+}
