@@ -7,7 +7,7 @@
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react)](https://react.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Drizzle-4169E1?logo=postgresql)](https://orm.drizzle.team/)
-[![CI](https://github.com/suandhee12-commits/slip/actions/workflows/ci.yml/badge.svg)](https://github.com/suandhee12-commits/slip/actions/workflows/ci.yml)
+[![CI](https://github.com/cosbata/slip/actions/workflows/ci.yml/badge.svg)](https://github.com/cosbata/slip/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 **slip** is an anonymous community that turns rejection experiences from hiring and fundraising into structured reflection data. People can document a company, role, interview stage, investor, or funding round and connect that experience to what happened next.
@@ -104,7 +104,7 @@ communities ── self-reference for organization and role hierarchies
 ### Installation
 
 ```bash
-git clone https://github.com/suandhee12-commits/slip.git
+git clone https://github.com/cosbata/slip.git
 cd slip
 npm ci
 cp .env.example .env.local
