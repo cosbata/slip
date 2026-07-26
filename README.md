@@ -2,81 +2,84 @@
 
 > Rejection is a data point.
 
+[Live Product](https://slip.wtf/) · [Report a Security Issue](SECURITY.md)
+
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![React](https://img.shields.io/badge/React-19-149ECA?logo=react)](https://react.dev/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Drizzle-4169E1?logo=postgresql)](https://orm.drizzle.team/)
+[![CI](https://github.com/suandhee12-commits/slip/actions/workflows/ci.yml/badge.svg)](https://github.com/suandhee12-commits/slip/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-**slip**은 취업과 투자 과정에서 사라지는 거절 경험을 익명의 회고 데이터로 바꾸는 커뮤니티입니다. 사용자는 회사·직무·면접 단계 또는 투자사·라운드별로 경험을 기록하고, 비슷한 사례와 이후 결과를 함께 확인할 수 있습니다.
+**slip** is an anonymous community that turns rejection experiences from hiring and fundraising into structured reflection data. People can document a company, role, interview stage, investor, or funding round and connect that experience to what happened next.
 
-![slip 커뮤니티 화면](public/readme/community.png)
+![slip community screen](public/readme/community.png)
 
-성공 사례만 남기는 커리어 플랫폼과 달리, slip은 “어디서 떨어졌는가”보다 **어떤 과정이 있었고 그 뒤 무엇이 달라졌는가**를 축적합니다.
+Unlike career platforms that preserve only successful outcomes, slip records **what the process looked like and what changed afterward**.
 
-## 핵심 문제
+## The Problem
 
-거절 경험은 개인에게는 중요한 학습 데이터지만 대부분 비공개 메모나 일회성 커뮤니티 글로 흩어집니다.
+Rejection is valuable learning data, but it is usually scattered across private notes and short-lived community posts.
 
-- 같은 회사와 단계의 경험을 구조적으로 비교하기 어렵습니다.
-- 익명성과 신뢰를 함께 지키기 어렵습니다.
-- 거절 이후의 결과가 기록되지 않아 회고가 한 시점에서 멈춥니다.
-- 유용한 글이 회사·직무·투자 단계의 맥락 없이 소비됩니다.
+- Experiences from the same company and stage are difficult to compare.
+- Anonymity and trust are difficult to maintain together.
+- Most stories end at the rejection instead of recording the later outcome.
+- Useful posts lose the context of company, role, interview stage, or funding round.
 
-slip은 게시물을 커뮤니티와 단계별 데이터에 연결하고, 반응·댓글·후속 결과를 같은 기록 안에 남깁니다.
+slip connects each story to a structured community and stage, then keeps reactions, discussion, and follow-up outcomes attached to the same record.
 
-## 구현된 기능
+## Implemented Features
 
-| 영역 | 구현 내용 |
+| Area | What is implemented |
 | --- | --- |
-| 구조화된 회고 | 회사/투자사 커뮤니티, 직무·면접 단계, 펀딩 단계, 후속 결과 |
-| 익명 커뮤니티 | 익명 게시, 댓글, 투표, 공감 반응, 신고 |
-| 탐색 | 커뮤니티·태그·검색·팔로잉 피드 |
-| 후속 기록 | 거절 이후 결과와 30일 리마인드 알림 |
-| 신뢰와 운영 | 커뮤니티 규칙, 신고 상태, 관리자 요청 검토 |
-| 콘텐츠 | Editor.js 기반 본문, 이미지 업로드, 외부 글 임베드 |
-| 인증 | Supabase Auth 기반 세션과 사용자 프로필 |
+| Structured reflection | Company and investor communities, job and interview stages, funding rounds, and later outcomes |
+| Anonymous community | Anonymous publishing, comments, votes, reactions, and reports |
+| Discovery | Community pages, tags, search, and a following feed |
+| Follow-up records | Outcome updates and 30-day reminder notifications |
+| Trust and operations | Community rules, moderation status, and admin review |
+| Content | Editor.js posts, image uploads, and external post embeds |
+| Authentication | Supabase Auth sessions and user profiles |
 
-## 제품 흐름
+## Product Flow
 
 ```text
-경험 작성
-  → 회사/투자사와 세부 단계 선택
-  → 익명 또는 공개 게시
-  → 댓글·투표·공감 반응
-  → 후속 결과 기록
-  → 같은 맥락의 회고 데이터로 축적
+Write an experience
+  → Select a company/investor and stage
+  → Publish anonymously or publicly
+  → Collect comments, votes, and reactions
+  → Record the later outcome
+  → Add it to a comparable body of reflection data
 ```
 
-## 기술적 선택
+## Technical Decisions
 
-### 계층형 커뮤니티
+### Hierarchical communities
 
-`companies/google/swe`처럼 상위 기관과 하위 직무를 한 구조로 표현합니다. 별도 제품 화면을 늘리지 않고 같은 피드와 URL 체계로 회사, 투자사, 세부 분야를 탐색할 수 있습니다.
+A route such as `companies/google/swe` represents both a parent organization and a child role. Companies, investors, and specialties share the same feed and URL model instead of requiring separate product surfaces.
 
-### 결과까지 이어지는 데이터 모델
+### A data model that continues after rejection
 
-게시물에는 면접·투자 단계뿐 아니라 `outcomeCategory`, `outcomeStory`, `outcomeNudgeSentAt`이 포함됩니다. 거절 당시의 감상만 모으는 대신 이후의 변화까지 연결하기 위한 설계입니다.
+Posts include interview or fundraising stages as well as `outcomeCategory`, `outcomeStory`, and `outcomeNudgeSentAt`. This preserves what changed after the initial rejection instead of freezing the story at one moment.
 
-### 서버리스 환경의 연결 관리
+### Connection management for serverless workloads
 
-PostgreSQL 연결은 개발 중 hot reload에서 재사용하고, transaction pooler에 맞춰 prepared statement를 끄며 idle connection을 반환합니다. 서버리스 인스턴스가 연결을 계속 점유해 전체 페이지가 중단되던 문제를 DB 경계에서 해결했습니다.
+PostgreSQL connections are reused during development hot reload, prepared statements are disabled for transaction poolers, and idle connections are released. The fix lives at the database boundary so every page benefits from the same connection behavior.
 
-### 홈 피드 비용 제어
+### Controlled home-feed cost
 
-홈 화면은 사용자별 인증 조회를 분리하고 캐시 가능한 서버 렌더링을 유지합니다. 데이터 수, 최신 글, 추천 커뮤니티를 병렬로 조회한 뒤 중복 콘텐츠를 제거합니다.
+User-specific authentication is isolated from cacheable server rendering. Counts, recent posts, and suggested communities are fetched in parallel before duplicate posts are removed.
 
-## 아키텍처
+## Architecture
 
 ```text
 Next.js App Router
-├── Server Components ───── 피드·커뮤니티·게시물 조회
-├── Route Handlers ──────── 게시·댓글·투표·반응·신고
-├── Supabase SSR ────────── 인증과 세션
-├── Drizzle ORM ─────────── 타입 안전 쿼리와 스키마
-└── PostgreSQL ──────────── 사용자·커뮤니티·게시물·상호작용
+├── Server Components ───── feeds, communities, and posts
+├── Route Handlers ──────── publishing, comments, votes, reactions, reports
+├── Supabase SSR ────────── authentication and sessions
+├── Drizzle ORM ─────────── typed queries and schema
+└── PostgreSQL ──────────── users, communities, posts, and interactions
 ```
 
-## 데이터 모델
+## Data Model
 
 ```text
 users ─┬─ posts ─┬─ comments
@@ -87,18 +90,18 @@ users ─┬─ posts ─┬─ comments
        ├─ community_members
        └─ notifications
 
-communities ── self reference로 기관/직무 계층 구성
+communities ── self-reference for organization and role hierarchies
 ```
 
-## 시작하기
+## Quick Start
 
-### 요구 사항
+### Requirements
 
 - Node.js 20+
 - PostgreSQL
-- Supabase 프로젝트
+- A Supabase project
 
-### 설치
+### Installation
 
 ```bash
 git clone https://github.com/suandhee12-commits/slip.git
@@ -107,72 +110,70 @@ npm ci
 cp .env.example .env.local
 ```
 
-`.env.local`에 PostgreSQL과 Supabase 값을 입력합니다.
+Add the PostgreSQL and Supabase values to `.env.local`, then run:
 
 ```bash
 npx drizzle-kit migrate
 npm run dev
 ```
 
-개발 서버는 [http://localhost:3004](http://localhost:3004)에서 실행됩니다.
+The development server runs at [http://localhost:3004](http://localhost:3004).
 
-## 환경변수
+## Environment Variables
 
-| 변수 | 용도 |
+| Variable | Purpose |
 | --- | --- |
-| `DATABASE_URL` | PostgreSQL 연결 문자열 |
-| `NEXT_PUBLIC_SUPABASE_URL` | Supabase 프로젝트 URL |
-| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | 브라우저/SSR용 공개 키 |
-| `SUPABASE_SERVICE_ROLE_KEY` | 관리자 작업용 서버 키 |
-| `NEXT_PUBLIC_APP_URL` | canonical URL과 콜백 기준 URL |
-| `FOUNDER_EMAIL` | 관리자 권한을 판별할 이메일 |
-| `FOUNDER_PASSWORD` | 관리자 계정 생성 스크립트에만 사용하는 초기 비밀번호 |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public browser and SSR key |
+| `SUPABASE_SERVICE_ROLE_KEY` | Server-side administrative operations |
+| `NEXT_PUBLIC_APP_URL` | Canonical and callback URL; use `https://slip.wtf` in production |
+| `FOUNDER_EMAIL` | Email used to identify the administrator |
+| `FOUNDER_PASSWORD` | Initial password used only by the admin creation script |
 
-## 주요 명령어
+## Commands
 
 ```bash
 npm run dev      # localhost:3004
 npm run build    # production build
 npm run start    # production server
 npm run lint     # ESLint
-npm test         # 중복 게시물 회귀 테스트
+npm test         # regression test
 ```
 
-## 현재 검증 상태
+## Verification
 
-| 항목 | 상태 |
+| Check | Current result |
 | --- | --- |
-| TypeScript 컴파일 | 통과 |
-| 프로덕션 번들 생성 | 통과 |
-| 정적 페이지 데이터 수집 | PostgreSQL 마이그레이션 후 검증 |
-| ESLint | 통과, 오류 0개 |
-| 자동 회귀 테스트 | 통과, 중복 제목·URL의 첫 게시물 보존 검증 |
-| GitHub Actions | PostgreSQL 16에서 migration, lint, test, build 실행 |
+| TypeScript | Passed |
+| Production build | Passed |
+| Static page data | Verified after PostgreSQL migration |
+| ESLint | Passed with 0 errors |
+| Regression test | Passed; preserves the first post when titles or URLs are duplicated |
+| GitHub Actions | Runs PostgreSQL 16, migrations, lint, tests, and build |
 
-동일한 검증 과정은 [`.github/workflows/ci.yml`](.github/workflows/ci.yml)에서 자동 실행됩니다.
+The same checks run in [`.github/workflows/ci.yml`](.github/workflows/ci.yml).
 
-## 프로젝트 구조
+## Repository Structure
 
 ```text
 slip/
-├── src/app/                 # 화면과 API route handlers
-├── src/components/          # 피드, 에디터, 댓글, 커뮤니티 UI
-├── src/lib/                 # Supabase, 타입, 중복 제거 로직
+├── src/app/                 # Pages and route handlers
+├── src/components/          # Feed, editor, comment, and community UI
+├── src/lib/                 # Supabase, types, and deduplication
 ├── drizzle/
-│   ├── schema.ts            # PostgreSQL 스키마
-│   └── migrations/          # 버전 관리되는 마이그레이션
-├── scripts/                 # 시드·운영·검증 도구
-└── public/                  # 로고와 정적 자산
+│   ├── schema.ts            # PostgreSQL schema
+│   └── migrations/          # Versioned migrations
+├── scripts/                 # Seed, operations, and verification tools
+└── public/                  # Brand and static assets
 ```
 
-## 공개 전 체크
+## Data Safety
 
-- 테스트용 데이터와 실제 사용자 데이터를 분리합니다.
-- `SUPABASE_SERVICE_ROLE_KEY`와 DB 연결 문자열은 절대 커밋하지 않습니다.
-- 실제 사용자 경험을 공개할 때는 개인·면접관·기밀 정보를 제거합니다.
+- Keep test data separate from real user data.
+- Never commit `SUPABASE_SERVICE_ROLE_KEY` or database credentials.
+- Remove personal, interviewer, and confidential information before publishing real experiences.
 
-## 라이선스
+## License
 
-[MIT](LICENSE)
-
-취약점은 공개 이슈 대신 [`SECURITY.md`](SECURITY.md)의 비공개 제보 절차를 이용해 주세요.
+[MIT](LICENSE). Please use the private reporting process in [`SECURITY.md`](SECURITY.md) for vulnerabilities.
